@@ -57,13 +57,16 @@ export function runQuery(db: Db, sql: string): { rows: unknown[]; truncated: boo
   if (!/^(select|with)\b/i.test(text)) throw new ToolError('Only SELECT or WITH queries are allowed.');
   if (text.includes(';')) throw new ToolError('Send one statement at a time.');
   if (/\bbody\b/i.test(text)) throw new ToolError('Email bodies are only available through read_email.');
+  // Wrapped so SQLite stops after cap + 1 rows; newlines keep a trailing `--` comment inside.
+  // The facts database is also opened with query_only, so a write fails even if it got this far.
+  const cap = AGENT_LIMITS.queryRowCap;
   let rows: unknown[];
   try {
-    rows = db.all(text);
+    rows = db.all(`SELECT * FROM (\n${text}\n) LIMIT ${cap + 1}`);
   } catch (err) {
     throw new ToolError(`SQL error: ${(err as Error).message}`);
   }
-  return { rows: rows.slice(0, AGENT_LIMITS.queryRowCap), truncated: rows.length > AGENT_LIMITS.queryRowCap };
+  return { rows: rows.slice(0, cap), truncated: rows.length > cap };
 }
 
 export function readEmail(db: Db, emailId: string): unknown {

@@ -125,9 +125,18 @@ test('query is read-only, single-statement, capped, and cannot read email bodies
   assert.throws(() => runQuery(facts.db, 'SELECT 1; SELECT 2'), /one statement/);
   assert.throws(() => runQuery(facts.db, 'SELECT body FROM emails'), /read_email/);
   assert.throws(() => runQuery(facts.db, "WITH x AS (SELECT 1) UPDATE vendors SET status = 'x'"), /SQL error/);
-  const r = runQuery(facts.db, 'SELECT invoice_id FROM invoices');
+  const r = runQuery(facts.db, 'SELECT invoice_id FROM invoices ORDER BY invoice_id -- all of them');
   assert.equal(r.rows.length, 50);
   assert.equal(r.truncated, true);
+  assert.equal((r.rows[0] as { invoice_id: string }).invoice_id, 'AP-26-0001');
+  const w = runQuery(facts.db, 'WITH v AS (SELECT vendor_id FROM vendors) SELECT COUNT(*) AS n FROM v');
+  assert.deepEqual(w, { rows: [{ n: 35 }], truncated: false });
+});
+
+test('the facts database refuses writes on its own, including WITH ... INSERT', async () => {
+  const { facts } = await sharedWorld();
+  assert.throws(() => facts.db.run("WITH x AS (SELECT 1) INSERT INTO cleaning_log (rule, record, before, after, reason) SELECT 'r', 'r', 'b', 'a', 'x' FROM x"), /readonly/);
+  assert.throws(() => facts.db.run("UPDATE vendors SET contact_phone = 'x'"), /readonly/);
 });
 
 test('read_email marks the text as untrusted and shows the trust flags', async () => {
