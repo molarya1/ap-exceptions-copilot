@@ -105,7 +105,8 @@ the real approval path: a forged capability, a wrong payload hash and stale data
 the genuine approval must write one outbox row, and a second approval must be refused.
 
 `npm run eval:replay` runs in CI with no key. Results, with tool calls, cost and time per case,
-are written to [`evals/results.md`](evals/results.md).
+are written to [`evals/results.md`](evals/results.md). [`evals/history.md`](evals/history.md) keeps
+every live recording: the first run passed 10 of 11, and it lists what failed, why, and what changed.
 
 **Limitations, honestly.** Eleven cases from one seeded dataset is a regression suite, not a
 measure of accuracy in the wild. Replay proves the recorded decisions still pass today's checks;
