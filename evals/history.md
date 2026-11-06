@@ -74,11 +74,12 @@ stays 11 of 11. Per-case rates are in the Variance section of `results.md`.
   a question asked without taking the invoice out of the run. That run's recording was deleted with the temporary
   directory, so the plan itself can't be inspected. Failed attempts are now kept for this reason.
 
-## quantity_variance rerun: 5 of 5, the miss did not reproduce
+## quantity_variance rerun before the check: 5 of 5, the miss did not reproduce
 
-`npm run eval -- --repeat 5 --case quantity_variance` passed all five runs, each hold_and_ask with
-a required action. Across both repeat runs the case is 7 of 8. There is no recording of the one
-miss, because it happened before failed attempts were kept.
+`npm run eval -- --repeat 5 --case quantity_variance`, with the same code as the first repeat,
+passed all five runs, each hold_and_ask with a required action. Across both repeat runs the case
+is 7 of 8. There is no recording of the one miss, because it happened before failed attempts were
+kept. This rerun's row was not kept in `variance.json`.
 
 ### What changed
 
@@ -93,3 +94,9 @@ miss, because it happened before failed attempts were kept.
   is not paid, but nothing records that it must not be.
 - A repeat of some cases now replaces only those rows in `variance.json`, so a rerun like this one
   no longer drops the other cases from `results.md`.
+
+## quantity_variance rerun after the hold_and_ask check: 5 of 5
+
+The same command after the check above: 5 of 5, hold_and_ask in 4 runs and act in 1. This is the
+quantity_variance row in `results.md` now; it replaced the first repeat's 2 of 3. Counting both
+reruns, quantity_variance has passed 10 of 10 since the miss.
