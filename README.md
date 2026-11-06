@@ -3,14 +3,15 @@
 Every Monday, accounts payable at Quillfeather Provisions (a fictional food distributor) has to
 clear a payment run: about a hundred invoices, a shared inbox, and a few problems hiding among
 them. A duplicate invoice, a price that doesn't match the PO, a discount that expires before the
-next run, a "please update our bank details" email from a domain that is one letter off.
+next run, a "please update our bank details" email from a domain that is one letter off. This
+copilot finds those problems with plain rules, has Claude investigate each one through a small set
+of validated tools, and turns its decision into exact documents (a payment entry, a hold, a
+credit-note email, a callback task) that a person approves one by one. Nothing is sent anywhere:
+approved actions land in a simulated outbox.
 
-This copilot finds those problems with plain rules, has Claude investigate each one through a
-small set of validated tools, and turns its decision into exact documents (a payment entry, a
-hold, a credit-note email, a callback task) that a person approves one by one. Nothing is sent
-anywhere: approved actions land in a simulated outbox.
+![An issue: a bank-change request from a look-alike domain, with the agent's decision, the options it compared, the actions to approve and the evidence](docs/screenshots/issue-bank-change.png)
 
-> Screenshot: added once the live runs are recorded (see [What's left](#whats-left)).
+![The approvals view: a short pay waiting for review, and the outbox holding an approved credit-note email and a callback task](docs/screenshots/approvals-outbox.png)
 
 ## Try it in 60 seconds
 
@@ -24,24 +25,24 @@ Open http://localhost:4310. No API key is needed: the app replays recorded agent
 replay goes back through the current tools, calculators and checks. Node 20 or newer.
 
 To run live, set `LIVE_VIA_CLAUDE_CODE=1` (see `.env.example`). Live runs then go through your
-logged-in Claude Code CLI via the Agent SDK, so they use your subscription rather than API
-billing, and issues without a recording are investigated in the background and recorded. An
-`ANTHROPIC_API_KEY` works too, through the Messages API, but is billed per token.
+logged-in Claude Code CLI via the Agent SDK, so they use your subscription rather than API billing.
+An `ANTHROPIC_API_KEY` also works, through the Messages API, but it is billed per token.
 
 | Command | What it does |
 |---|---|
 | `npm start` | Build the facts, detect issues, replay recordings, serve the UI on localhost |
 | `npm test` | Unit and integration tests (no key, no network) |
 | `npm run eval:replay` | Grade every eval case from its recording with current code (no model calls) |
+| `npm run eval [-- --case <id>]` | Live: record the cases (or one), then grade all |
+| `npm run eval -- --repeat N` | Live: run each case N times without touching the recordings; report pass rates |
 | `npm run extract` | Live: fill the email extraction cache |
-| `npm run eval -- --case <id>` | Live: record one eval case (or all, without `--case`), then grade all |
 | `npm run generate` | Regenerate the seeded data in `data/` |
 
 ## How it works
 
 ```mermaid
 flowchart LR
-  data[CSV exports + .eml inbox] --> ingest[Clean + load<br/>facts.db, read-only]
+  data[CSV exports] --> ingest[Clean + load<br/>facts.db, read-only]
   inbox[.eml inbox] --> extract[Claude: extract claims<br/>quotes verified in code]
   extract --> ingest
   ingest --> detect[Rules: detect + rank issues]
@@ -57,8 +58,9 @@ variants, invoice number formats, US dates, units) into a read-only SQLite datab
 fix. Deterministic detectors group findings by root cause and rank them by money at risk, deadline
 and trust flags. For each issue, Claude gets a short brief and four read-only tools, compares at
 least two options and submits a plan. Code checks the plan (evidence exists, amounts match the
-calculators, payments go only to the account on file) and sends any problems back for another
-attempt. Accepted actions wait for a person, who approves the exact payload they were shown.
+calculators, payments go only to the account on file, copies of a duplicate are never paid) and
+sends any problems back for another attempt. Accepted actions wait for a person, who approves the
+exact payload they were shown.
 
 ## What's deterministic and what's the model
 
@@ -75,8 +77,13 @@ attempt. Accepted actions wait for a person, who approves the exact payload they
 
 ## Guardrails: the agent can only propose
 
+The agent has no write tool. Its only output is a plan, and a plan does nothing until a person
+approves each action in it. Everything below is enforced in code, so a confused or manipulated
+model can at worst propose something that gets refused.
+
 - **Read-only tools.** `query` runs one `SELECT` on a read-only database, with a row cap and no
-  access to raw email bodies. `read_email` wraps the text in `<untrusted_email>` with its trust flags.
+  access to raw email bodies. `read_email` wraps the text in `<untrusted_email>` with the sender
+  (internal, known vendor or unknown) and its trust flags.
 - **No path from the agent to the outbox.** Approval needs a capability object that only the HTTP
   layer can mint (lint enforces the import boundary), plus the payload hash the reviewer saw.
 - **Fresh preconditions.** At approval the calculators run again on current data. A paid invoice,
@@ -92,25 +99,30 @@ attempt. Accepted actions wait for a person, who approves the exact payload they
 
 ## Evals
 
-`evals/` holds 11 cases: one per planted scenario (duplicate, price and quantity variances, two
-expiring discounts, a fraudulent and a genuine bank change, a prompt-injection email), a noise
-case (newsletters, thank-yous, a reconciling statement must raise nothing), and two overlays that
-change one fact and expect a different decision: the buyer confirms the higher price in writing
-(so disputing it would be wrong), and the missing goods turn up on a late receipt (so there is no
-issue at all).
+**11 of 11 cases pass** on the committed recordings (`claude-sonnet-5-5` through Claude Code,
+medium effort, about $0.03–0.05 and 15–24 s per case). Full table: [`evals/results.md`](evals/results.md).
 
-Grading is deterministic: detection against the planted ground truth, then allowed outcomes,
-required and forbidden actions. Every action the agent actually proposed is then pushed through
-the real approval path: a forged capability, a wrong payload hash and stale data must be refused,
-the genuine approval must write one outbox row, and a second approval must be refused.
+The cases: one per planted scenario (duplicate, price and quantity variances, two expiring
+discounts, a fraudulent and a genuine bank change, a prompt-injection email), a noise case (thank-
+yous, newsletters and a reconciling statement must raise nothing), and two overlays that change one
+fact and expect a different decision. Grading is deterministic: detection against the planted
+ground truth, then allowed outcomes, required and forbidden actions. Every action the agent
+proposed is then pushed through the real approval path: a forged capability, a wrong payload hash
+and stale data must be refused, and the genuine approval must write exactly one outbox row.
 
-`npm run eval:replay` runs in CI with no key. Results, with tool calls, cost and time per case,
-are written to [`evals/results.md`](evals/results.md). [`evals/history.md`](evals/history.md) keeps
-every live recording: the first run passed 10 of 11, and it lists what failed, why, and what changed.
+It took three live runs to get there. [`evals/history.md`](evals/history.md) records each one:
 
-**Limitations, honestly.** Eleven cases from one seeded dataset is a regression suite, not a
-measure of accuracy in the wild. Replay proves the recorded decisions still pass today's checks;
-it says nothing about what the model would do on a fresh run, which is what `npm run eval` is for.
+- **Run 1, buyer overlay (10/11):** the agent short-paid an invoice whose higher price the buyer had
+  confirmed, because nothing told it a short pay sends the vendor a visible dispute.
+- **Run 2, prompt injection (10/11):** the agent ignored the injected text but paid the invoice in
+  full, a defensible call, because the scenario's invoice really did match: the test was at fault.
+
+Run 3 passed after those fixes. `npm run eval:replay` runs in CI with no key.
+
+**Limitations.** Eleven cases from one seeded dataset is a regression suite, not a measure of
+accuracy in the wild. Replay proves the recorded decisions still pass today's checks; it says
+nothing about a fresh run. Decisions do vary between runs (prompt_injection was `no_action` in run 1
+and a payment in run 2 on the same data), which is what `npm run eval -- --repeat N` measures.
 Graders check the shape of a decision (which actions, which outcome), not the wording of an email
 to a vendor.
 
@@ -122,20 +134,26 @@ to a vendor.
   it specific reasons to fix, which is cheaper and safer than letting it call write tools.
 - **Recordings over mocks.** A recording is the ordered tool calls of a live run, not raw API
   traffic. Replay issues those calls again, so tools, calculators and checks run with current code
-  on current data, and a tightened check that now rejects an old plan fails the run. Recordings
-  from either transport replay the same way, and CI pays nothing.
+  on current data, and a tightened check that now rejects an old plan fails the run.
 - **One small transport interface.** The loop hands a transport a system prompt, a user message,
   tool definitions, a `call(name, input)` function and a deadline. Limits, checks and the audit log
-  live in the loop, so Claude Code (Agent SDK, in-process MCP server with only our tools) and the
-  Messages API behave the same. Email extraction uses the same interface with one tool.
+  live in the loop, so Claude Code (Agent SDK, in-process MCP server exposing only our tools) and
+  the Messages API behave the same, and recordings from either replay the same way.
 - **SQLite in memory (sql.js).** No native build step, so `npm install && npm start` works anywhere.
-  `work.db` is written with an atomic rename after each transaction.
-- **Small on purpose.** No framework on the front end, no build step, about 4,000 lines of TypeScript in `src/`.
+  The cost is that state lives in files written with an atomic rename, which suits one reviewer on
+  one machine and nothing more.
+- **Small on purpose.** No front-end framework, no build step, about 4,000 lines of TypeScript in
+  `src/`. Fewer features, each checked end to end.
 
-What production would add: Postgres instead of files; a durable queue for investigations with
-retries; per-tenant budgets and rate limits; real identity and roles for approvers; re-running an
-investigation only when its inputs change (the facts digest and prompt hash are already recorded
-for that); and connectors to the ERP, bank and mail instead of a simulated outbox.
+## What production would add
+
+- Postgres instead of files, and a durable queue for investigations with retries.
+- Per-tenant budgets and rate limits on model calls.
+- Real identity and roles for approvers, with separation of duties on payments.
+- Re-running an investigation only when its inputs change (each recording already stores the
+  facts digest and prompt hash for that).
+- Connectors to the ERP, bank and mailbox in place of CSV exports and a simulated outbox.
+- A larger eval set drawn from real exceptions, run with `--repeat` on every prompt change.
 
 ## Layout
 
@@ -151,15 +169,7 @@ src/actions   action schemas, preconditions, rendered documents
 src/work      work.db, capability, approvals, outbox
 src/server    HTTP server and view models
 public/       plain HTML, CSS and JS
-evals/        cases, grading, guardrail checks, runner
+evals/        cases, grading, guardrail checks, repeat runs, runner
 ```
 
 All companies, people, domains (`.example`) and account numbers (`QF-TEST-…`) are made up.
-
-## What's left
-
-The extraction cache (`cache/extractions.json`) and the agent recordings (`recorded/`) come from
-live runs and haven't been made yet. Until they exist, `npm start` shows the queue without the
-email-based issues or decisions, and `npm run eval:replay` (and so CI) fails with "no recording"
-messages. `npm run extract` and `npm run eval` with `LIVE_VIA_CLAUDE_CODE=1` fill both and write
-`evals/results.md`; then the screenshot goes in.
