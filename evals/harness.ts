@@ -62,6 +62,7 @@ export interface Recorded {
   id: string;
   status: RunResult['status'] | 'skipped';
   detail: string | null;
+  file?: string; // the recording written for this case
 }
 
 /** Live pass: fills missing extractions, then runs and records the agent on each chosen case. */
@@ -77,7 +78,7 @@ export async function recordCases(o: EvalOptions, live: { agent: Transport; extr
     } else {
       const result = await investigate({ transport: live.agent, db: facts.db, issue, duplicateCopies: duplicateCopies(issues), audit: memoryAudit() });
       saveRecording(recordingDir(o, c), issue.issue_id, effort, facts.digest, result);
-      r = { id: c.id, status: result.status, detail: result.failure };
+      r = { id: c.id, status: result.status, detail: result.failure, file: join(recordingDir(o, c), `${issue.issue_id}.json`) };
     }
     out.push(r);
     onDone?.(r);

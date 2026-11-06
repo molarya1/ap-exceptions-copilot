@@ -1,4 +1,5 @@
 import type { EvalReport } from './harness';
+import { outcomeMix, type Variance } from './repeat';
 
 // evals/results.md, always from the replay pass. Tool calls, cost and time are the live
 // run's, read from each recording, so replaying unchanged code reproduces the same file.
@@ -6,7 +7,7 @@ import type { EvalReport } from './harness';
 const secs = (v: number | null) => (v === null ? '—' : `${(v / 1000).toFixed(1)} s`);
 const cell = (s: string) => s.replaceAll('|', '\\|').replaceAll('\n', ' ');
 
-export function renderReport(r: EvalReport): string {
+export function renderReport(r: EvalReport, variance: Variance | null = null): string {
   const passed = r.results.filter((x) => x.pass).length;
   const recorded = r.results.filter((x) => x.tool_calls !== null);
   const estimated = recorded.some((x) => x.cost_estimated);
@@ -37,6 +38,21 @@ export function renderReport(r: EvalReport): string {
       const reasons = [...x.detection.reasons, ...(x.decision?.reasons ?? []), ...(x.guardrails?.reasons ?? [])];
       lines.push(`- **${x.id}**: ${reasons.map(cell).join('; ')}`);
     }
+  }
+  if (variance) {
+    const day = variance.recorded_at.slice(0, 10);
+    lines.push(
+      '',
+      '## Variance: repeated live runs',
+      '',
+      `Each decision case run ${variance.repeats} times live on ${day} (\`${variance.model}\` via ${variance.transport}, ${variance.effort} effort) and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes.`,
+      '',
+      '| Case | Passed | Outcomes |',
+      '|---|---:|---|',
+      ...variance.cases.map((c) => `| ${c.id} | ${c.passes}/${c.runs} | ${outcomeMix(c.outcomes)} |`),
+    );
+    const failing = variance.cases.filter((c) => c.failures.length);
+    if (failing.length) lines.push('', ...failing.flatMap((c) => c.failures.map((f) => `- **${c.id}** ${cell(f)}`)));
   }
   return lines.join('\n') + '\n';
 }

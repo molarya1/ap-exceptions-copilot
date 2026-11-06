@@ -5,6 +5,9 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { recordCases, runEvals, type EvalOptions } from '../evals/harness';
 import { renderReport } from '../evals/report';
+import { outcomeMix, repeatCases } from '../evals/repeat';
+import { CASES } from '../evals/cases';
+import { existsSync, readFileSync } from 'node:fs';
 import { fixtureExtractionTransport, scriptedTransport } from './fixtures/transports';
 
 // The eval harness end to end, with the scripted test agent standing in for the model:
@@ -39,4 +42,21 @@ test('replay without recordings fails each decision case with a clear message', 
   assert.equal(dup.pass, false);
   assert.match(dup.decision!.reasons[0]!, /no recording .*npm run eval -- --case duplicate_invoice/);
   assert.equal(r.results.find((x) => x.id === 'overlay_late_receipt')!.pass, true);
+});
+
+test('repeat runs each decision case N times, tallies pass rates, and keeps only all-pass cases', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'apx-eval-'));
+  const o: EvalOptions = { dataDir: 'data', cachePath: join(dir, 'extractions.json'), recordedDir: join(dir, 'recorded'), cases: CASES.filter((c) => ['discount_juniper', 'overlay_buyer_confirms_price', 'noise'].includes(c.id)) };
+  const v = await repeatCases(o, { agent: scriptedTransport(), extraction: fixtureExtractionTransport() }, 'medium', 2, true);
+  assert.deepEqual(v.cases.map((c) => [c.id, `${c.passes}/${c.runs}`, c.kept]), [['discount_juniper', '2/2', true], ['overlay_buyer_confirms_price', '0/2', false]]);
+  assert.match(v.cases[1]!.failures[0]!, /^run 1: forbidden action short_pay/);
+  // Only the all-pass case was copied into the recordings directory, at its usual path.
+  assert.ok(existsSync(join(o.recordedDir, 'disc-AP-26-0082.json')));
+  assert.equal(existsSync(join(o.recordedDir, 'overlays')), false);
+  assert.equal(JSON.parse(readFileSync(join(o.recordedDir, 'disc-AP-26-0082.json'), 'utf8')).status, 'planned');
+
+  const md = renderReport(await runEvals(o), v);
+  assert.match(md, /\| discount_juniper \| 2\/2 \| act \|/);
+  assert.match(md, /\| overlay_buyer_confirms_price \| 0\/2 \| act \|/);
+  assert.equal(outcomeMix({ act: 2, hold_and_ask: 1 }), 'act ×2, hold_and_ask ×1');
 });
