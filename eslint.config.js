@@ -16,6 +16,14 @@ export default tseslint.config(
     languageOptions: { globals: { document: 'readonly', window: 'readonly', fetch: 'readonly', location: 'readonly', history: 'readonly' } },
   },
   {
+    // Only the HTTP layer may mint a human capability.
+    files: ['src/**/*.ts'],
+    ignores: ['src/server/**'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [{ group: ['**/work/capability'], importNames: ['mintCapability'], message: 'Only src/server may mint a human capability.' }] }],
+    },
+  },
+  {
     // The agent proposes; only the HTTP layer may approve. Enforced at import level.
     files: ['src/agent/**/*.ts', 'src/extract/**/*.ts'],
     rules: {
