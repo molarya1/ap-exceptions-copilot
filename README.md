@@ -34,7 +34,7 @@ An `ANTHROPIC_API_KEY` also works, through the Messages API, but it is billed pe
 | `npm test` | Unit and integration tests (no key, no network) |
 | `npm run eval:replay` | Grade every eval case from its recording with current code (no model calls) |
 | `npm run eval [-- --case <id>]` | Live: record the cases (or one), then grade all |
-| `npm run eval -- --repeat N` | Live: run each case N times without touching the recordings; report pass rates |
+| `npm run eval -- --repeat N` | Live: run each decision case N times without touching the recordings; report pass rates |
 | `npm run extract` | Live: fill the email extraction cache |
 | `npm run generate` | Regenerate the seeded data in `data/` |
 
@@ -100,7 +100,10 @@ model can at worst propose something that gets refused.
 ## Evals
 
 **11 of 11 cases pass** on the committed recordings (`claude-sonnet-5-5` through Claude Code,
-medium effort, about $0.03–0.05 and 15–24 s per case). Full table: [`evals/results.md`](evals/results.md).
+medium effort, about $0.03–0.05 and 15–24 s per case). **26 of 27 fresh runs passed** when each
+decision case was run three more times; quantity_variance once chose to hold and ask without a
+hold action. Full tables: [`evals/results.md`](evals/results.md), with per-case pass rates under
+[Variance](evals/results.md#variance-repeated-live-runs).
 
 The cases: one per planted scenario (duplicate, price and quantity variances, two expiring
 discounts, a fraudulent and a genuine bank change, a prompt-injection email), a noise case (thank-
@@ -110,21 +113,22 @@ ground truth, then allowed outcomes, required and forbidden actions. Every actio
 proposed is then pushed through the real approval path: a forged capability, a wrong payload hash
 and stale data must be refused, and the genuine approval must write exactly one outbox row.
 
-It took three live runs to get there. [`evals/history.md`](evals/history.md) records each one:
+`npm run eval:replay` grades the recordings in CI with no key. `npm run eval -- --repeat N` runs
+the 9 decision cases N times live without touching the recordings, and keeps the recording of any
+failed attempt; noise and the late-receipt overlay only check detection, which is deterministic.
+[`evals/history.md`](evals/history.md) records every live run, including two earlier failures:
 
-- **Run 1, buyer overlay (10/11):** the agent short-paid an invoice whose higher price the buyer had
-  confirmed, because nothing told it a short pay sends the vendor a visible dispute.
-- **Run 2, prompt injection (10/11):** the agent ignored the injected text but paid the invoice in
-  full, a defensible call, because the scenario's invoice really did match: the test was at fault.
-
-Run 3 passed after those fixes. `npm run eval:replay` runs in CI with no key.
+- **Buyer overlay:** the agent short-paid an invoice whose higher price the buyer had confirmed,
+  because nothing told it a short pay sends the vendor a visible dispute.
+- **Prompt injection:** the agent ignored the injected text but paid in full, a defensible call,
+  because the scenario's invoice really did match: the test was at fault.
 
 **Limitations.** Eleven cases from one seeded dataset is a regression suite, not a measure of
 accuracy in the wild. Replay proves the recorded decisions still pass today's checks; it says
-nothing about a fresh run. Decisions do vary between runs (prompt_injection was `no_action` in run 1
-and a payment in run 2 on the same data), which is what `npm run eval -- --repeat N` measures.
-Graders check the shape of a decision (which actions, which outcome), not the wording of an email
-to a vendor.
+nothing about a fresh run. Fresh runs do vary: 26 of 27 passed, and the one miss
+(quantity_variance holding without a hold action) would not show up in replay at all. Three runs
+per case is still a small sample. Graders check the shape of a decision (which actions, which
+outcome), not the wording of an email to a vendor.
 
 ## Design decisions and tradeoffs
 
