@@ -73,3 +73,23 @@ stays 11 of 11. Per-case rates are in the Variance section of `results.md`.
   of the required actions (hold_payment, short_pay or request_credit_note) in run 1, most likely
   a question asked without taking the invoice out of the run. That run's recording was deleted with the temporary
   directory, so the plan itself can't be inspected. Failed attempts are now kept for this reason.
+
+## quantity_variance rerun: 5 of 5, the miss did not reproduce
+
+`npm run eval -- --repeat 5 --case quantity_variance` passed all five runs, each hold_and_ask with
+a required action. Across both repeat runs the case is 7 of 8. There is no recording of the one
+miss, because it happened before failed attempts were kept.
+
+### What changed
+
+- **A likely cause, not a confirmed one.** The plan checks accepted a hold_and_ask plan with no
+  actions: they only required an open question and no payments. A plan that asks about the
+  missing 40 cases without holding AP-26-0079 would have passed the checks and failed the eval's
+  required action, which matches what the grader reported for run 1. Since the miss was not
+  reproduced, this is the most plausible explanation, not a proven one.
+- On a match failure, a hold_and_ask plan now needs hold_payment on the invoice (or, for an open
+  invoice, request_credit_note); the rejection goes back to the agent like any other check. Why
+  it matters: an approved invoice is already in this run and would be paid in full; an open one
+  is not paid, but nothing records that it must not be.
+- A repeat of some cases now replaces only those rows in `variance.json`, so a rerun like this one
+  no longer drops the other cases from `results.md`.
