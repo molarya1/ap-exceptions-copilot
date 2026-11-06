@@ -158,3 +158,28 @@ test('the injected invoice cannot be paid in full; only the matched amount can b
   const short: Action = { type: 'short_pay', invoice_id: inv, pay_cents: match.payable_cents, disputed_cents: match.disputed_cents, currency: 'USD', pay_to_account: acct, reason: '300 of 405 pallet-weeks received' };
   assert.deepEqual(checkPlan(plan([short], { evidence_ids: [inv] }), ctx), []);
 });
+
+test('hold_and_ask on a match failure must hold the invoice (or ask for a credit note), not only ask', async () => {
+  const inv = scenario('quantity_variance').invoice_ids[0]!;
+  const { ctx, facts } = await setup('quantity_variance', [['match_check', inv]]);
+  const ask = (actions: Action[]) => checkPlan(plan(actions, { outcome: 'hold_and_ask', open_questions: ['Did the other 40 cases arrive?'], evidence_ids: [inv] }), ctx);
+
+  assert.deepEqual(ask([]), [`${inv} fails the match; asking alone records no decision on it. Add hold_payment (or request_credit_note) for ${inv}.`]);
+  assert.deepEqual(ask([{ type: 'hold_payment', invoice_id: inv, reason: 'r' }]), []);
+  assert.deepEqual(ask([{ type: 'hold_payment', invoice_id: 'AP-26-0001', reason: 'r' }]).filter((p) => p.startsWith(inv)).length, 1, 'a hold on another invoice does not count');
+
+  // Already in this run: only a hold keeps it from being paid in full.
+  const approved = facts.db.get<{ invoice_id: string }>("SELECT invoice_id FROM invoices WHERE status = 'approved' LIMIT 1")!.invoice_id;
+  const inRun = { ...ctx, issue: { ...ctx.issue, invoice_ids: [approved] } };
+  const askInRun = (actions: Action[]) => checkPlan(plan(actions, { outcome: 'hold_and_ask', open_questions: ['q'], evidence_ids: [approved] }), inRun);
+  assert.match(askInRun([]).join(), /already approved for this run, so asking alone lets it be paid in full\. Add hold_payment/);
+  assert.match(askInRun([{ type: 'request_credit_note', invoice_id: approved, vendor_id: 'V001', to: 'x', amount_cents: 1, subject: 's', body: 'b' }]).join(), /already approved for this run/);
+  assert.equal(askInRun([{ type: 'hold_payment', invoice_id: approved, reason: 'r' }]).some((p) => p.includes('already approved')), false);
+});
+
+test('the match check also applies when a flagged email carries the match failure', async () => {
+  const { ctx, issue } = await setup('prompt_injection');
+  const inv = (issue.details.match_exceptions as { invoice_id: string }[])[0]!.invoice_id;
+  const problems = checkPlan(plan([], { outcome: 'hold_and_ask', open_questions: ['q'], evidence_ids: [inv] }), ctx);
+  assert.ok(problems.some((p) => p.startsWith(`${inv} fails the match`)), problems.join('\n'));
+});

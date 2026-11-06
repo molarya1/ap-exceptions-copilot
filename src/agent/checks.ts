@@ -30,6 +30,13 @@ export function idExists(db: Db, id: string): boolean {
   return lookup ? db.get(lookup[1], [id]) !== undefined : false;
 }
 
+/** Invoices this issue says fail the three-way match, including one folded into a flagged email. */
+function matchFailures(issue: Issue): string[] {
+  if (issue.type === 'match_exception') return issue.invoice_ids.slice(0, 1);
+  const folded = issue.details.match_exceptions as { invoice_id: string }[] | undefined;
+  return folded?.map((m) => m.invoice_id) ?? [];
+}
+
 export function checkPlan(plan: Plan, ctx: CheckContext): string[] {
   const p: string[] = [];
 
@@ -45,6 +52,14 @@ export function checkPlan(plan: Plan, ctx: CheckContext): string[] {
   if (plan.outcome === 'hold_and_ask') {
     if (plan.open_questions.length === 0) p.push('Outcome "hold_and_ask" needs at least one open question.');
     if (plan.actions.some((a) => PAYMENT_TYPES.includes(a.type))) p.push('Outcome "hold_and_ask" cannot include payments.');
+    // Asking is not a decision. An approved invoice is already in this run and would be paid in
+    // full; an open one is not paid, but without an action nothing records that it must not be.
+    for (const id of matchFailures(ctx.issue)) {
+      const status = ctx.db.get<{ status: string }>('SELECT status FROM invoices WHERE invoice_id = ?', [id])?.status;
+      const acts = plan.actions.filter((a) => 'invoice_id' in a && a.invoice_id === id).map((a) => a.type);
+      if (status === 'approved' && !acts.includes('hold_payment')) p.push(`${id} fails the match and is already approved for this run, so asking alone lets it be paid in full. Add hold_payment for ${id}.`);
+      if (status === 'open' && !acts.includes('hold_payment') && !acts.includes('request_credit_note')) p.push(`${id} fails the match; asking alone records no decision on it. Add hold_payment (or request_credit_note) for ${id}.`);
+    }
   }
 
   if (ctx.issue.type === 'bank_change_request') {
