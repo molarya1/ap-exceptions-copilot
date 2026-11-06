@@ -11,6 +11,10 @@ import { approvalsView, issueView, queueView, stateView } from './views';
 // State-changing requests also need an allowed Host and a matching Origin.
 
 const COOKIE = 'apx_session';
+const BODY_LIMIT = 64_000;
+
+/** A client mistake: answered with 400 and this fixed message. */
+class BadRequest extends Error {}
 const STATIC: Record<string, [string, string]> = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
@@ -76,7 +80,7 @@ export function createApp(app: App, port: number, publicDir = 'public'): Server 
         if (!cap) return send(res, 401, { error: 'no session; reload the page' });
         const m = /^\/api\/actions\/([\w.-]+)\/(approve|reject)$/.exec(url.pathname);
         if (!m) return send(res, 404, { error: 'not found' });
-        const body = JSON.parse((await readBody(req)) || '{}') as { payload_hash?: unknown; reason?: unknown };
+        const body = await readJsonObject(req);
         const hash = typeof body.payload_hash === 'string' ? body.payload_hash : '';
         const decision = m[2] === 'approve' ? approveAction(cap, deps, m[1]!, hash) : rejectAction(cap, deps, m[1]!, hash, typeof body.reason === 'string' ? body.reason.slice(0, 500) : '');
         return send(res, decision.ok ? 200 : 409, decision);
@@ -84,23 +88,31 @@ export function createApp(app: App, port: number, publicDir = 'public'): Server 
 
       return send(res, 405, 'method not allowed');
     } catch (err) {
-      return send(res, 500, { error: (err as Error).message });
+      if (err instanceof BadRequest) return send(res, 400, { error: err.message });
+      console.error('request failed:', err); // details stay in the server log, not in the response
+      return send(res, 500, { error: 'internal error' });
     }
   });
 }
 
-function readBody(req: IncomingMessage, limit = 64_000): Promise<string> {
-  return new Promise((resolve, reject) => {
+/** Reads a small JSON object body. An oversized body is drained and discarded so a response can still be sent. */
+async function readJsonObject(req: IncomingMessage): Promise<Record<string, unknown>> {
+  const text = await new Promise<string>((resolve, reject) => {
     let size = 0;
     const chunks: Buffer[] = [];
     req.on('data', (c: Buffer) => {
       size += c.length;
-      if (size > limit) {
-        reject(new Error('body too large'));
-        req.destroy();
-      } else chunks.push(c);
+      if (size <= BODY_LIMIT) chunks.push(c);
     });
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('end', () => (size > BODY_LIMIT ? reject(new BadRequest('request body is too large')) : resolve(Buffer.concat(chunks).toString('utf8'))));
     req.on('error', reject);
   });
+  let body: unknown;
+  try {
+    body = JSON.parse(text || '{}');
+  } catch {
+    throw new BadRequest('request body is not valid JSON');
+  }
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) throw new BadRequest('request body must be a JSON object');
+  return body as Record<string, unknown>;
 }

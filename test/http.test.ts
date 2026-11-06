@@ -83,6 +83,17 @@ test('a wrong hash is refused; the right one approves once', async () => {
   assert.ok(outbox.some((o) => o.action_id === a.action_id));
 });
 
+test('malformed or oversized bodies get 400 with a fixed message', async () => {
+  const cookie = await session();
+  const a = await pendingAction();
+  const raw = (body: string) => fetch(`${base()}/api/actions/${a.action_id}/approve`, { method: 'POST', headers: { 'content-type': 'application/json', cookie, origin: base() }, body });
+  for (const [body, message] of [['{"payload_hash": ', 'request body is not valid JSON'], ['[1, 2]', 'request body must be a JSON object'], ['null', 'request body must be a JSON object'], [`{"reason": "${'x'.repeat(70_000)}"}`, 'request body is too large']] as const) {
+    const res = await raw(body);
+    assert.equal(res.status, 400, body.slice(0, 20));
+    assert.deepEqual(await res.json(), { error: message });
+  }
+});
+
 test('issue view includes evidence cards, actions with documents, and the tool trail', async () => {
   const issues = (await (await fetch(`${base()}/api/issues`)).json()) as { issue_id: string; type: string }[];
   const fraud = issues.find((i) => i.type === 'bank_change_request' && i.issue_id === 'bank-m14')!;
