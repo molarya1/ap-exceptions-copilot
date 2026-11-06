@@ -1,0 +1,154 @@
+invoice_id,line_no,po_line_id,description,unit,quantity,unit_price,line_total
+AP-26-0001,1,,"Waste collection, Jan 2026",month,1,1934.91,1934.91
+AP-26-0001,2,,"Recycling pickup, Jan 2026",month,1,465.29,465.29
+AP-26-0002,1,,"Electricity service, DC and offices, Jan 2026",month,1,21157.51,21157.51
+AP-26-0003,1,,"Telecom and internet service, Jan 2026",month,1,1319.96,1319.96
+AP-26-0004,1,,"Water and sewer service, Jan 2026",month,1,2642.26,2642.26
+AP-26-0005,1,PO-24048-1,"Reefer load, Stockton to Quillfeather DC",load,6,1637.17,9823.02
+AP-26-0005,2,PO-24048-2,"LTL pallet delivery, regional",pallet,40,83.03,3321.20
+AP-26-0006,1,PO-24058-1,"LTL pallet delivery, regional",pallet,25,85.71,2142.75
+AP-26-0007,1,PO-24030-1,"Large eggs, 15 dozen",case,119,34.18,4067.42
+AP-26-0008,1,PO-24052-1,"Cold storage, pallet-week",pallet-week,242,21.16,5120.72
+AP-26-0009,1,PO-24064-1,Refrigeration unit service visit,visit,4,481.48,1925.92
+AP-26-0010,1,PO-24020-1,"Navel oranges, 88 ct",CS,123,30.89,3799.47
+AP-26-0010,2,PO-24020-2,"Lemons, 115 ct",case,86,41.97,3609.42
+AP-26-0011,1,PO-24034-1,"Clamshell, 1 lb vented",case,69,49.95,3446.55
+AP-26-0012,1,PO-24042-1,Corrugated shipper box 18x12x10,each,5265,0.66,3474.90
+AP-26-0012,2,PO-24042-2,"Pallet label roll, 4x6",roll,33,20.02,660.66
+AP-26-0013,1,PO-24054-1,"Reefer load, Stockton to Quillfeather DC",load,6,1483.65,8901.90
+AP-26-0014,1,PO-24009-1,"Spring mix, 3 lb",case,82,14.07,1153.74
+AP-26-0014,2,PO-24009-2,"Roma tomatoes, 25 lb",case,149,17.51,2608.99
+AP-26-0014,3,PO-24009-3,"Romaine hearts, 12 ct",case,165,25.74,4247.10
+AP-26-0015,1,PO-24010-1,"Romaine hearts, 12 ct",case,209,31.36,6554.24
+AP-26-0015,2,PO-24010-2,"Russet potatoes, 50 lb",sack,301,20.18,6074.18
+AP-26-0016,1,PO-24024-1,"Yellow onions, 50 lb",lb,6700,0.47,3149.00
+AP-26-0017,1,PO-24044-1,"Pallet, 48x40 heat treated",each,158,11.60,1832.80
+AP-26-0018,1,PO-24057-1,"Reefer load, Stockton to Quillfeather DC",load,4,1838.32,7353.28
+AP-26-0018,2,PO-24057-2,"LTL pallet delivery, regional",pallet,12,65.48,785.76
+AP-26-0019,1,PO-24061-1,"Reefer load, Stockton to Quillfeather DC",load,6,1717.72,10306.32
+AP-26-0020,1,PO-24072-1,Technician labor,hour,21,119.19,2502.99
+AP-26-0020,2,PO-24072-2,Forklift preventive maintenance,visit,3,327.85,983.55
+AP-26-0021,1,PO-24046-1,"Clamshell, 1 lb vented",case,72,42.36,3049.92
+AP-26-0021,2,PO-24046-2,"Stretch wrap, 18 in x 1500 ft",roll,82,23.19,1901.58
+AP-26-0021,3,PO-24046-3,Corrugated shipper box 18x12x10,EA,4628,0.58,2684.24
+AP-26-0022,1,PO-24062-1,"LTL pallet delivery, regional",pallet,20,77.42,1548.40
+AP-26-0022,2,PO-24062-2,"Reefer load, Stockton to Quillfeather DC",load,6,1562.44,9374.64
+AP-26-0023,1,PO-24059-1,"LTL pallet delivery, regional",pallet,35,73.52,2573.20
+AP-26-0023,2,PO-24059-2,"Reefer load, Stockton to Quillfeather DC",load,4,1676.80,6707.20
+AP-26-0024,1,PO-24019-1,"Navel oranges, 88 ct",case,80,32.16,2572.80
+AP-26-0025,1,PO-24026-1,"Yellow onions, 50 lb",lb,7800,0.36,2808.00
+AP-26-0026,1,PO-24023-1,"Cremini mushrooms, 10 lb",case,59,29.34,1731.06
+AP-26-0027,1,PO-24045-1,"Pallet, 48x40 heat treated",each,141,12.43,1752.63
+AP-26-0028,1,,"Waste collection, Feb 2026",month,1,1806.09,1806.09
+AP-26-0028,2,,"Recycling pickup, Feb 2026",month,1,400.37,400.37
+AP-26-0029,1,PO-24050-1,"Reefer load, Stockton to Quillfeather DC",load,2,1633.21,3266.42
+AP-26-0030,1,PO-24068-1,Technician labor,hour,21,128.58,2700.18
+AP-26-0031,1,PO-24032-1,"Large eggs, 15 dozen",case,70,39.09,2736.30
+AP-26-0032,1,,"Electricity service, DC and offices, Feb 2026",month,1,18782.78,18782.78
+AP-26-0033,1,,"Telecom and internet service, Feb 2026",month,1,1300.13,1300.13
+AP-26-0034,1,PO-24001-1,"Romaine hearts, 12 ct",case,180,29.44,5299.20
+AP-26-0034,2,PO-24001-2,"Gala apples, 40 lb",case,231,29.29,6765.99
+AP-26-0035,1,PO-24022-1,"Cremini mushrooms, 10 lb",CS,112,27.81,3114.72
+AP-26-0036,1,PO-24041-1,"Stretch wrap, 18 in x 1500 ft",Roll,105,23.39,2455.95
+AP-26-0036,2,PO-24041-2,Corrugated shipper box 18x12x10,each,3224,0.61,1966.64
+AP-26-0037,1,PO-24070-1,Technician labor,hour,14,102.12,1429.68
+AP-26-0038,1,,"Water and sewer service, Feb 2026",month,1,3182.77,3182.77
+AP-26-0039,1,PO-24002-1,"Carrots, 25 lb",case,137,13.51,1850.87
+AP-26-0039,2,PO-24002-2,"Roma tomatoes, 25 lb",case,116,16.52,1916.32
+AP-26-0040,1,PO-24012-1,"Roma tomatoes, 25 lb",case,232,18.92,4389.44
+AP-26-0040,2,PO-24012-2,"Green bell peppers, 25 lb",case,83,19.22,1595.26
+AP-26-0040,3,PO-24012-3,"Romaine hearts, 12 ct",case,147,28.12,4133.64
+AP-26-0041,1,PO-24040-1,"Stretch wrap, 18 in x 1500 ft",roll,48,25.91,1243.68
+AP-26-0041,2,PO-24040-2,Corrugated shipper box 18x12x10,ea,3700,0.68,2516.00
+AP-26-0041,3,PO-24040-3,"Clamshell, 1 lb vented",case,83,40.94,3398.02
+AP-26-0042,1,PO-24056-1,"LTL pallet delivery, regional",pallet,20,90.89,1817.80
+AP-26-0043,1,PO-24025-1,"Yellow onions, 50 lb",lb,10000,0.47,4700.00
+AP-26-0044,1,PO-24028-1,"Spring mix, 3 lb",case,93,16.85,1567.05
+AP-26-0044,2,PO-24028-2,"Roma tomatoes, 25 lb",case,91,18.21,1657.11
+AP-26-0045,1,PO-24007-1,"Gala apples, 40 lb",case,214,35.61,7620.54
+AP-26-0046,1,PO-24073-1,Refrigeration unit service visit,visit,2,531.68,1063.36
+AP-26-0047,1,PO-24029-1,"Lemons, 115 ct",case,57,37.34,2128.38
+AP-26-0048,1,PO-24049-1,"Reefer load, Stockton to Quillfeather DC",load,2,1457.75,2915.50
+AP-26-0049,1,PO-24027-1,"Gala apples, 40 lb",case,109,34.84,3797.56
+AP-26-0049,2,PO-24027-2,"Green bell peppers, 25 lb",case,122,21.79,2658.38
+AP-26-0049,3,PO-24027-3,"Lemons, 115 ct",CS,85,36.20,3077.00
+AP-26-0050,1,PO-24039-1,"Clamshell, 1 lb vented",case,113,48.55,5486.15
+AP-26-0050,2,PO-24039-2,"Pallet label roll, 4x6",roll,66,23.15,1527.90
+AP-26-0050,3,PO-24039-3,"Stretch wrap, 18 in x 1500 ft",Roll,156,25.29,3945.24
+,,,,,,,
+AP-26-0051,1,PO-24031-1,"Large eggs, 15 dozen",CS,65,40.64,2641.60
+AP-26-0052,1,PO-24074-1,Forklift preventive maintenance,visit,1,259.33,259.33
+AP-26-0053,1,PO-24060-1,"Reefer load, Stockton to Quillfeather DC",load,6,1609.48,9656.88
+AP-26-0054,1,PO-24065-1,Technician labor,hour,15,112.01,1680.15
+AP-26-0054,2,PO-24065-2,Refrigeration unit service visit,visit,3,576.15,1728.45
+AP-26-0055,1,PO-24035-1,"Stretch wrap, 18 in x 1500 ft",roll,118,22.00,2596.00
+AP-26-0056,1,PO-24076-1,"Roma tomatoes, 25 lb",Case,300,19.85,5955.00
+AP-26-0056,2,PO-24076-2,"Green bell peppers, 25 lb",case,120,22.10,2652.00
+AP-26-0057,1,PO-24014-1,"Lemons, 115 ct",case,67,41.91,2807.97
+AP-26-0058,1,PO-24016-1,"Green bell peppers, 25 lb",case,96,21.03,2018.88
+AP-26-0059,1,PO-24015-1,"Russet potatoes, 50 lb",sack,103,15.02,1547.06
+AP-26-0059,2,PO-24015-2,"Carrots, 25 lb",CS,287,12.21,3504.27
+AP-26-0060,1,PO-24075-1,Corrugated shipper box 18x12x10,each,4000,0.62,2480.00
+AP-26-0060,2,PO-24075-2,"Stretch wrap, 18 in x 1500 ft",roll,40,24.50,980.00
+AP-26-0061,1,PO-24075-1,Corrugated shipper box 18x12x10,ea,4000,0.62,2480.00
+AP-26-0061,2,PO-24075-2,"Stretch wrap, 18 in x 1500 ft",roll,40,24.50,980.00
+AP-26-0062,1,PO-24037-1,Corrugated shipper box 18x12x10,each,4689,0.74,3469.86
+AP-26-0063,1,PO-24082-1,"Cold storage, pallet-week",pallet-week,405,23.00,9315.00
+AP-26-0064,1,PO-24071-1,Forklift preventive maintenance,visit,3,260.68,782.04
+AP-26-0064,2,PO-24071-2,Technician labor,hour,19,106.56,2024.64
+AP-26-0064,3,PO-24071-3,Refrigeration unit service visit,visit,4,454.70,1818.80
+AP-26-0065,1,,"Telecom and internet service, Mar 2026",month,1,1317.06,1317.06
+AP-26-0066,1,PO-24008-1,"Gala apples, 40 lb",case,232,31.03,7198.96
+AP-26-0066,2,PO-24008-2,"Bartlett pears, 44 lb",case,125,34.57,4321.25
+AP-26-0067,1,PO-24021-1,"Cremini mushrooms, 10 lb",case,127,28.04,3561.08
+AP-26-0068,1,,"Waste collection, Mar 2026",month,1,2190.20,2190.20
+AP-26-0068,2,,"Recycling pickup, Mar 2026",month,1,556.10,556.10
+AP-26-0069,1,PO-24006-1,"Unsalted butter, 36 x 1 lb",case,44,106.25,4675.00
+AP-26-0069,2,PO-24006-2,"Whole milk, 4 x 1 gal",case,121,20.55,2486.55
+AP-26-0070,1,,Credit: 300 trays damaged in transit,each,-300,0.60,-180.00
+AP-26-0071,1,PO-24081-1,Refrigeration unit service visit,visit,2,485.00,970.00
+AP-26-0071,2,PO-24081-2,Technician labor,hour,12,110.00,1320.00
+AP-26-0072,1,,"Electricity service, DC and offices, Mar 2026",month,1,22705.15,22705.15
+AP-26-0073,1,,"Water and sewer service, Mar 2026",month,1,2394.41,2394.41
+AP-26-0074,1,PO-24005-1,"Unsalted butter, 36 x 1 lb",case,24,99.21,2381.04
+AP-26-0075,1,PO-24013-1,"Carrots, 25 lb",case,151,13.95,2106.45
+AP-26-0075,2,PO-24013-2,"Romaine hearts, 12 ct",case,206,24.47,5040.82
+AP-26-0075,3,PO-24013-3,"Roma tomatoes, 25 lb",case,87,20.56,1788.72
+AP-26-0076,1,PO-24080-1,"Reefer load, Stockton to Quillfeather DC",load,5,1570.00,7850.00
+AP-26-0077,1,PO-24063-1,Technician labor,hour,20,128.00,2560.00
+AP-26-0077,2,PO-24063-2,Refrigeration unit service visit,visit,2,531.08,1062.16
+AP-26-0078,1,PO-24003-1,"Carrots, 25 lb",case,228,13.72,3128.16
+AP-26-0078,2,PO-24003-2,"Gala apples, 40 lb",case,349,31.27,10913.23
+AP-26-0079,1,PO-24077-1,"Whole milk, 4 x 1 gal",case,200,21.50,4300.00
+AP-26-0080,1,PO-24051-1,"Cold storage, pallet-week",pallet-week,132,23.47,3098.04
+AP-26-0081,1,PO-24067-1,Technician labor,hour,23,109.34,2514.82
+AP-26-0081,2,PO-24067-2,Refrigeration unit service visit,visit,3,569.98,1709.94
+AP-26-0081,3,PO-24067-3,Forklift preventive maintenance,visit,3,308.06,924.18
+AP-26-0082,1,PO-24078-1,"Gala apples, 40 lb",case,400,31.00,12400.00
+AP-26-0083,1,PO-24004-1,"Whole milk, 4 x 1 gal",case,190,21.22,4031.80
+AP-26-0083,2,PO-24004-2,"Unsalted butter, 36 x 1 lb",case,52,111.36,5790.72
+AP-26-0084,1,PO-24055-1,"LTL pallet delivery, regional",pallet,28,84.74,2372.72
+AP-26-0084,2,PO-24055-2,"Reefer load, Stockton to Quillfeather DC",load,3,1568.93,4706.79
+AP-26-0085,1,PO-24069-1,Technician labor,hour,20,107.20,2144.00
+AP-26-0085,2,PO-24069-2,Forklift preventive maintenance,visit,1,257.99,257.99
+AP-26-0086,1,PO-24017-1,"Spring mix, 3 lb",case,231,16.90,3903.90
+AP-26-0086,2,PO-24017-2,"Romaine hearts, 12 ct",cs,53,27.24,1443.72
+AP-26-0087,1,PO-24033-1,Corrugated shipper box 18x12x10,each,2132,0.67,1428.44
+AP-26-0088,1,PO-24047-1,"Pallet label roll, 4x6",roll,74,22.19,1642.06
+AP-26-0088,2,PO-24047-2,"Clamshell, 1 lb vented",case,113,42.66,4820.58
+AP-26-0088,3,PO-24047-3,Corrugated shipper box 18x12x10,EA,3035,0.59,1790.65
+AP-26-0089,1,PO-24079-1,"Produce tray, molded pulp",each,3600,1.10,3960.00
+AP-26-0090,1,PO-24053-1,"Cold storage, pallet-week",pallet-week,242,22.00,5324.00
+AP-26-0091,1,PO-24011-1,"Romaine hearts, 12 ct",case,90,27.65,2488.50
+AP-26-0091,2,PO-24011-2,"Green bell peppers, 25 lb",case,67,21.02,1408.34
+AP-26-0091,3,PO-24011-3,"Russet potatoes, 50 lb",sack,172,17.74,3051.28
+AP-26-0092,1,PO-24036-1,"Produce tray, molded pulp",each,3192,1.35,4309.20
+AP-26-0092,2,PO-24036-2,Corrugated shipper box 18x12x10,each,1504,0.60,902.40
+AP-26-0093,1,PO-24038-1,"Produce tray, molded pulp",each,4224,1.35,5702.40
+AP-26-0094,1,PO-24043-1,Corrugated shipper box 18x12x10,each,2074,0.64,1327.36
+AP-26-0094,2,PO-24043-2,"Stretch wrap, 18 in x 1500 ft",roll,75,22.50,1687.50
+AP-26-0095,1,PO-24066-1,Technician labor,hour,14,97.55,1365.70
+AP-26-0095,2,PO-24066-2,Refrigeration unit service visit,visit,4,566.90,2267.60
+AP-26-0095,3,PO-24066-3,Forklift preventive maintenance,visit,1,329.11,329.11
+AP-26-0096,1,PO-24018-1,"Roma tomatoes, 25 lb",case,269,17.35,4667.15
+AP-26-0096,2,PO-24018-2,"Green bell peppers, 25 lb",case,115,22.02,2532.30

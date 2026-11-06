@@ -1,0 +1,135 @@
+po_line_id,po_id,item_description,unit,qty_ordered,unit_price
+PO-24001-1,PO-24001,"Romaine hearts, 12 ct",case,180,29.44
+PO-24001-2,PO-24001,"Gala apples, 40 lb",case,231,29.29
+PO-24002-1,PO-24002,"Carrots, 25 lb",case,137,13.51
+PO-24002-2,PO-24002,"Roma tomatoes, 25 lb",case,116,16.52
+PO-24003-1,PO-24003,"Carrots, 25 lb",case,228,13.72
+PO-24003-2,PO-24003,"Gala apples, 40 lb",case,349,31.27
+PO-24004-1,PO-24004,"Whole milk, 4 x 1 gal",case,190,21.22
+PO-24004-2,PO-24004,"Unsalted butter, 36 x 1 lb",case,52,111.36
+PO-24005-1,PO-24005,"Unsalted butter, 36 x 1 lb",case,24,99.21
+PO-24006-1,PO-24006,"Unsalted butter, 36 x 1 lb",case,44,106.25
+PO-24006-2,PO-24006,"Whole milk, 4 x 1 gal",case,121,20.55
+PO-24007-1,PO-24007,"Gala apples, 40 lb",case,214,35.61
+PO-24008-1,PO-24008,"Gala apples, 40 lb",case,232,31.03
+PO-24008-2,PO-24008,"Bartlett pears, 44 lb",case,125,34.57
+PO-24009-1,PO-24009,"Spring mix, 3 lb",case,82,14.07
+PO-24009-2,PO-24009,"Roma tomatoes, 25 lb",case,149,17.51
+PO-24009-3,PO-24009,"Romaine hearts, 12 ct",case,165,25.74
+PO-24010-1,PO-24010,"Romaine hearts, 12 ct",case,209,31.36
+PO-24010-2,PO-24010,"Russet potatoes, 50 lb",sack,301,20.18
+PO-24011-1,PO-24011,"Romaine hearts, 12 ct",case,90,27.65
+PO-24011-2,PO-24011,"Green bell peppers, 25 lb",case,67,21.02
+PO-24011-3,PO-24011,"Russet potatoes, 50 lb",sack,172,17.74
+PO-24012-1,PO-24012,"Roma tomatoes, 25 lb",case,232,18.92
+PO-24012-2,PO-24012,"Green bell peppers, 25 lb",case,83,19.22
+PO-24012-3,PO-24012,"Romaine hearts, 12 ct",case,147,28.12
+PO-24013-1,PO-24013,"Carrots, 25 lb",case,151,13.95
+PO-24013-2,PO-24013,"Romaine hearts, 12 ct",case,206,24.47
+PO-24013-3,PO-24013,"Roma tomatoes, 25 lb",case,87,20.56
+PO-24014-1,PO-24014,"Lemons, 115 ct",case,67,41.91
+PO-24015-1,PO-24015,"Russet potatoes, 50 lb",sack,103,15.02
+PO-24015-2,PO-24015,"Carrots, 25 lb",case,287,12.21
+PO-24016-1,PO-24016,"Green bell peppers, 25 lb",case,96,21.03
+PO-24017-1,PO-24017,"Spring mix, 3 lb",case,231,16.90
+PO-24017-2,PO-24017,"Romaine hearts, 12 ct",case,53,27.24
+PO-24018-1,PO-24018,"Roma tomatoes, 25 lb",case,269,17.35
+PO-24018-2,PO-24018,"Green bell peppers, 25 lb",case,115,22.02
+PO-24019-1,PO-24019,"Navel oranges, 88 ct",case,80,32.16
+PO-24020-1,PO-24020,"Navel oranges, 88 ct",case,123,30.89
+PO-24020-2,PO-24020,"Lemons, 115 ct",case,86,41.97
+PO-24021-1,PO-24021,"Cremini mushrooms, 10 lb",case,127,28.04
+PO-24022-1,PO-24022,"Cremini mushrooms, 10 lb",case,112,27.81
+PO-24023-1,PO-24023,"Cremini mushrooms, 10 lb",case,59,29.34
+PO-24024-1,PO-24024,"Yellow onions, 50 lb",sack,134,23.50
+PO-24025-1,PO-24025,"Yellow onions, 50 lb",sack,200,23.50
+PO-24026-1,PO-24026,"Yellow onions, 50 lb",sack,156,18.00
+PO-24027-1,PO-24027,"Gala apples, 40 lb",case,109,34.84
+PO-24027-2,PO-24027,"Green bell peppers, 25 lb",case,122,21.79
+PO-24027-3,PO-24027,"Lemons, 115 ct",case,85,36.20
+PO-24028-1,PO-24028,"Spring mix, 3 lb",case,93,16.85
+PO-24028-2,PO-24028,"Roma tomatoes, 25 lb",case,91,18.21
+PO-24029-1,PO-24029,"Lemons, 115 ct",case,57,37.34
+PO-24030-1,PO-24030,"Large eggs, 15 dozen",case,119,34.18
+PO-24031-1,PO-24031,"Large eggs, 15 dozen",case,65,40.64
+PO-24032-1,PO-24032,"Large eggs, 15 dozen",case,70,39.09
+PO-24033-1,PO-24033,Corrugated shipper box 18x12x10,each,2132,0.67
+PO-24034-1,PO-24034,"Clamshell, 1 lb vented",case,69,49.95
+PO-24035-1,PO-24035,"Stretch wrap, 18 in x 1500 ft",roll,118,22.00
+PO-24036-1,PO-24036,"Produce tray, molded pulp",case,133,32.40
+PO-24036-2,PO-24036,Corrugated shipper box 18x12x10,each,1504,0.60
+PO-24037-1,PO-24037,Corrugated shipper box 18x12x10,each,4689,0.74
+PO-24038-1,PO-24038,"Produce tray, molded pulp",case,176,32.40
+PO-24039-1,PO-24039,"Clamshell, 1 lb vented",case,113,48.55
+PO-24039-2,PO-24039,"Pallet label roll, 4x6",roll,66,23.15
+PO-24039-3,PO-24039,"Stretch wrap, 18 in x 1500 ft",roll,156,25.29
+PO-24040-1,PO-24040,"Stretch wrap, 18 in x 1500 ft",roll,48,25.91
+PO-24040-2,PO-24040,Corrugated shipper box 18x12x10,each,3700,0.68
+PO-24040-3,PO-24040,"Clamshell, 1 lb vented",case,83,40.94
+PO-24041-1,PO-24041,"Stretch wrap, 18 in x 1500 ft",roll,105,23.39
+PO-24041-2,PO-24041,Corrugated shipper box 18x12x10,each,3224,0.61
+PO-24042-1,PO-24042,Corrugated shipper box 18x12x10,each,5265,0.66
+PO-24042-2,PO-24042,"Pallet label roll, 4x6",roll,33,20.02
+PO-24043-1,PO-24043,Corrugated shipper box 18x12x10,each,2074,0.64
+PO-24043-2,PO-24043,"Stretch wrap, 18 in x 1500 ft",roll,75,22.50
+PO-24044-1,PO-24044,"Pallet, 48x40 heat treated",each,158,11.60
+PO-24045-1,PO-24045,"Pallet, 48x40 heat treated",each,141,12.43
+PO-24046-1,PO-24046,"Clamshell, 1 lb vented",case,72,42.36
+PO-24046-2,PO-24046,"Stretch wrap, 18 in x 1500 ft",roll,82,23.19
+PO-24046-3,PO-24046,Corrugated shipper box 18x12x10,each,4628,0.58
+PO-24047-1,PO-24047,"Pallet label roll, 4x6",roll,74,22.19
+PO-24047-2,PO-24047,"Clamshell, 1 lb vented",case,113,42.66
+PO-24047-3,PO-24047,Corrugated shipper box 18x12x10,each,3035,0.59
+PO-24048-1,PO-24048,"Reefer load, Stockton to Quillfeather DC",load,6,1637.17
+PO-24048-2,PO-24048,"LTL pallet delivery, regional",pallet,40,83.03
+PO-24049-1,PO-24049,"Reefer load, Stockton to Quillfeather DC",load,2,1457.75
+PO-24050-1,PO-24050,"Reefer load, Stockton to Quillfeather DC",load,2,1633.21
+PO-24051-1,PO-24051,"Cold storage, pallet-week",pallet-week,132,23.47
+PO-24052-1,PO-24052,"Cold storage, pallet-week",pallet-week,242,21.16
+PO-24053-1,PO-24053,"Cold storage, pallet-week",pallet-week,242,22.00
+PO-24054-1,PO-24054,"Reefer load, Stockton to Quillfeather DC",load,6,1483.65
+PO-24055-1,PO-24055,"LTL pallet delivery, regional",pallet,28,84.74
+PO-24055-2,PO-24055,"Reefer load, Stockton to Quillfeather DC",load,3,1568.93
+PO-24056-1,PO-24056,"LTL pallet delivery, regional",pallet,20,90.89
+PO-24057-1,PO-24057,"Reefer load, Stockton to Quillfeather DC",load,4,1838.32
+PO-24057-2,PO-24057,"LTL pallet delivery, regional",pallet,12,65.48
+PO-24058-1,PO-24058,"LTL pallet delivery, regional",pallet,25,85.71
+PO-24059-1,PO-24059,"LTL pallet delivery, regional",pallet,35,73.52
+PO-24059-2,PO-24059,"Reefer load, Stockton to Quillfeather DC",load,4,1676.80
+PO-24060-1,PO-24060,"Reefer load, Stockton to Quillfeather DC",load,6,1609.48
+PO-24061-1,PO-24061,"Reefer load, Stockton to Quillfeather DC",load,6,1717.72
+PO-24062-1,PO-24062,"LTL pallet delivery, regional",pallet,20,77.42
+PO-24062-2,PO-24062,"Reefer load, Stockton to Quillfeather DC",load,6,1562.44
+PO-24063-1,PO-24063,Technician labor,hour,20,128.00
+PO-24063-2,PO-24063,Refrigeration unit service visit,visit,2,531.08
+PO-24064-1,PO-24064,Refrigeration unit service visit,visit,4,481.48
+PO-24065-1,PO-24065,Technician labor,hour,15,112.01
+PO-24065-2,PO-24065,Refrigeration unit service visit,visit,3,576.15
+PO-24066-1,PO-24066,Technician labor,hour,14,97.55
+PO-24066-2,PO-24066,Refrigeration unit service visit,visit,4,566.90
+PO-24066-3,PO-24066,Forklift preventive maintenance,visit,1,329.11
+PO-24067-1,PO-24067,Technician labor,hour,23,109.34
+PO-24067-2,PO-24067,Refrigeration unit service visit,visit,3,569.98
+PO-24067-3,PO-24067,Forklift preventive maintenance,visit,3,308.06
+PO-24068-1,PO-24068,Technician labor,hour,21,128.58
+PO-24069-1,PO-24069,Technician labor,hour,20,107.20
+PO-24069-2,PO-24069,Forklift preventive maintenance,visit,1,257.99
+PO-24070-1,PO-24070,Technician labor,hour,14,102.12
+PO-24071-1,PO-24071,Forklift preventive maintenance,visit,3,260.68
+PO-24071-2,PO-24071,Technician labor,hour,19,106.56
+PO-24071-3,PO-24071,Refrigeration unit service visit,visit,4,454.70
+PO-24072-1,PO-24072,Technician labor,hour,21,119.19
+PO-24072-2,PO-24072,Forklift preventive maintenance,visit,3,327.85
+PO-24073-1,PO-24073,Refrigeration unit service visit,visit,2,531.68
+PO-24074-1,PO-24074,Forklift preventive maintenance,visit,1,259.33
+PO-24075-1,PO-24075,Corrugated shipper box 18x12x10,each,4000,0.62
+PO-24075-2,PO-24075,"Stretch wrap, 18 in x 1500 ft",roll,40,24.50
+PO-24076-1,PO-24076,"Roma tomatoes, 25 lb",case,300,18.40
+PO-24076-2,PO-24076,"Green bell peppers, 25 lb",case,120,22.10
+PO-24077-1,PO-24077,"Whole milk, 4 x 1 gal",case,200,21.50
+PO-24078-1,PO-24078,"Gala apples, 40 lb",case,400,31.00
+PO-24079-1,PO-24079,"Produce tray, molded pulp",case,150,26.40
+PO-24080-1,PO-24080,"Reefer load, Stockton to Quillfeather DC",load,5,1570.00
+PO-24081-1,PO-24081,Refrigeration unit service visit,visit,2,485.00
+PO-24081-2,PO-24081,Technician labor,hour,12,110.00
+PO-24082-1,PO-24082,"Cold storage, pallet-week",pallet-week,405,23.00

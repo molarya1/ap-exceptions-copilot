@@ -1,0 +1,99 @@
+invoice_id,vendor,vendor_invoice_number,invoice_date,due_date,currency,total,status,received_via
+AP-26-0001,Northgate Waste Services Inc,NOR-2084,2026-01-01,2026-01-31,USD,2400.20,paid,email
+AP-26-0002,Larchmont Power & Light,LAR-6309,2026-01-02,2026-01-17,USD,21157.51,paid,email
+AP-26-0003,Brandt Telecom LLC.,BRA-3193,2026-01-03,2026-02-02,,1319.96,paid,email
+AP-26-0004,Tamsin County Water,tam-5934,2026-01-04,2026-01-19,USD,"$2,642.26",paid,mail
+AP-26-0005,Ostrander Freight Lines Inc,OST-1907,2026-01-09,2026-02-08,USD,13144.22,paid,erp
+AP-26-0006,COASTLINE LTL,COA-1930,2026-01-09,2026-02-08,USD,2142.75,paid,email
+AP-26-0007,Tolland Egg Farm Inc,TOL-5521,2026-01-11,2026-02-10,USD,4067.42,paid,erp
+AP-26-0008,Fenwick Cold Storage LLC,FEN-4242,2026-01-13,2026-02-12,USD,5120.72,paid,erp
+AP-26-0009,Pell & Hart Equipment Service LLC,PEL-3515,2026-01-13,2026-02-12,USD,1925.92,paid,erp
+AP-26-0010,Copperfield Citrus LLC,COP-7357,2026-01-17,2026-02-16,USD,7408.89,paid,email
+AP-26-0011,Harlow Packaging Ltd,HAR-4727,2026-01-17,2026-02-16,USD,3446.55,paid,erp
+AP-26-0012,PINECREST LABELS,PIN-4075,2026-01-19,2026-02-18,USD,4135.56,paid,erp
+AP-26-0013,Bellamy Reefer Transport Inc.,BEL-2087,2026-01-19,2026-02-18,USD,8901.90,paid,email
+AP-26-0014,Saskatoon Prairie Growers Ltd.,sas-6614,2026-01-20,2026-02-19,cad,8009.83,paid,erp
+AP-26-0015,Saskatoon Prairie Growers Ltd,SAS-6632,2026-01-20,2026-02-19,CAD,12628.42,paid,email
+AP-26-0016,Redd Mesa Onion Co,RED-3878,2026-01-21,2026-02-20,USD,3149.00,paid,erp
+AP-26-0017,Sutter Pallet Works Inc,SUT-1998,2026-01-21,2026-02-20,USD,1832.80,paid,email
+AP-26-0018,Greyling Logistics LLC,GRE-6766,2026-01-22,2026-02-21,USD,8139.04,paid,email
+AP-26-0019,Ridgeway Haulage Inc,RID-4937,2026-01-22,2026-02-21,USD,10306.32,paid,email
+AP-26-0020,Castellan Electric Co,CAS-7124,01/23/2026,2026-03-09,USD,3486.54,paid,email
+AP-26-0021,Oakhurst Containers Inc,OAK-2208,2026-01-24,2026-03-10,USD,7635.74,paid,erp
+AP-26-0022,Ridgeway Haulage Inc.,RID-4976,2026-01-25,2026-02-24,USD,10923.04,paid,erp
+AP-26-0023,Coastline LTL Co,COA-1950,2026-01-28,2026-02-27,,9280.40,paid,erp
+AP-26-0024,Copperfield Citrus LLC,COP-7349,2026-01-29,2026-02-28,,2572.80,paid,email
+AP-26-0025,Redd Mesa Onion Co,RED 3898,2026-01-30,2026-03-01,USD,2808.00,paid,erp
+AP-26-0026,Hollis Mushroom Farm Inc,HOL-5318,2026-01-31,2026-03-02,USD,1731.06,paid,email
+AP-26-0027,SUTTER PALLET WORKS,SUT-2025,2026-02-01,2026-03-03,USD,1752.63,paid,erp
+AP-26-0028,Northgate Waste Services Inc,NOR-2118,2026-02-01,2026-03-03,USD,2206.46,paid,mail
+AP-26-0029,OSTRANDER FREIGHT LINES,OST-1960,2026-02-02,2026-03-04,USD,3266.42,paid,erp
+AP-26-0030,Dunmore Forklift Service Inc,DUN-5406,2026-02-02,2026-03-04,USD,"$2,700.18",paid,erp
+AP-26-0031,Tolland Egg Farm Inc.,TOL-5570,2026-02-03,2026-03-05,USD,2736.30,paid,erp
+AP-26-0032,Larchmont Power & Light,LAR-6327,2026-02-03,2026-02-18,USD,18782.78,paid,email
+,,,,,,,,
+AP-26-0033,Brandt Telecom LLC.,BRA-3205,2026-02-03,2026-03-05,,1300.13,paid,email
+AP-26-0034,Brightwater Growers LLC,BRI-6919,2026-02-04,2026-03-06,USD,12065.19,paid,erp
+AP-26-0035,HOLLIS MUSHROOM FARM,HOL-5292,2026-02-04,2026-03-06,USD,3114.72,paid,erp
+AP-26-0036,Pinecrest Labels Co,PIN-4047,2026-02-04,2026-03-06,USD,4422.59,paid,email
+AP-26-0037,Castellan Electric Co,CAS-7074,2026-02-04,2026-03-21,USD,1429.68,approved,email
+AP-26-0038,Tamsin County Water,TAM 5939,2026-02-04,2026-02-19,,3182.77,paid,mail
+AP-26-0039,Brightwater Growers LLC,BRI-6929,2026-02-05,2026-03-07,USD,3767.19,paid,erp
+AP-26-0040,Marrow Creek Farms LLC,MAR-2402,02/08/2026,2026-03-10,USD,10118.34,paid,erp
+AP-26-0041,Mardale Films and Wraps LLC.,MAR-4617,2026-02-08,2026-03-10,USD,7157.70,paid,erp
+AP-26-0042,Greyling Logistics LLC,GRE-6759,2026-02-08,2026-03-10,USD,1817.80,paid,email
+AP-26-0043,Redd Mesa Onion Co.,RED-3893,2026-02-09,2026-03-11,USD,4700.00,paid,email
+AP-26-0044,Wren Hollow Greens LLC,WRE-1629,2026-02-09,2026-03-11,USD,3224.16,paid,email
+AP-26-0045,Juniper Hill Orchards Inc,JUN-5107,02/12/2026,2026-03-14,USD,7620.54,paid,email
+AP-26-0046,Halverson Facility Services LLC,HAL 5768,2026-02-13,2026-03-15,USD,1063.36,paid,erp
+AP-26-0047,Wren Hollow Greens LLC,WRE-1654,2026-02-14,2026-03-16,USD,2128.38,approved,erp
+AP-26-0048,Ostrander Freight Lines Inc,OST-1921,2026-02-14,2026-03-16,USD,2915.50,approved,email
+AP-26-0049,WREN HOLLOW GREENS,WRE-1604,2026-02-15,2026-03-17,USD,9532.94,approved,email
+AP-26-0050,Mardale Films & Wraps LLC,MAR-4579,2026-02-15,2026-03-17,USD,10959.29,approved,erp
+AP-26-0051,Tolland Egg Farm Inc,TOL-5530,2026-02-16,2026-03-18,USD,"$2,641.60",approved,erp
+AP-26-0052,Halverson Facility Services LLC,HAL-5792,02/16/2026,2026-03-18,USD,259.33,approved,email
+AP-26-0053,Coastline LTL Co,COA-1973,2026-02-17,2026-03-19,USD,9656.88,approved,erp
+AP-26-0054,Vettori Refrigerazione S.r.l..,VET-2298,2026-02-20,2026-04-06,EUR,"$3,408.60",open,erp
+AP-26-0055,Harlow Packaging Ltd,HAR-4739,02/22/2026,2026-03-24,USD,2596.00,open,erp
+AP-26-0056,Brightwater Growers LLC,BG-2026-0318,2026-02-25,2026-03-27,USD,8607.00,open,erp
+AP-26-0057,Ashgrove Produce Co,ASH-7648,2026-02-26,2026-03-28,USD,2807.97,open,erp
+AP-26-0058,Linden Bend Farms Inc,LIN-7859,2026-02-27,2026-03-29,,2018.88,open,erp
+AP-26-0059,Ashgrove Produce Co,ASH-7657,2026-03-01,2026-03-31,USD,5051.33,open,email
+AP-26-0060,Harlow Packaging Ltd,INV-00412,2026-03-02,2026-04-01,USD,3460.00,approved,erp
+AP-26-0061,Harlow Pkg,inv 412,2026-03-02,2026-04-01,USD,3460.00,open,email
+AP-26-0062,KESTREL BOX & CARTON,KES-7532,2026-03-02,2026-04-01,USD,3469.86,open,erp
+AP-26-0063,Fenwick Cold Storage LLC,FCS-1093,2026-03-02,2026-04-01,USD,9315.00,open,email
+AP-26-9001,Sutter Pallet Works,SP-PENDING,2026-03-12,,USD,see attached,open,mail
+AP-26-0064,CASTELLAN ELECTRIC,CAS-7099,2026-03-02,2026-04-16,USD,4625.48,open,erp
+AP-26-0065,Brandt Telecom LLC.,BRA-3216,2026-03-02,2026-04-01,USD,1317.06,open,mail
+AP-26-0066,Juniper Hill Orchards Inc,JUN-5111,2026-03-03,2026-04-02,USD,11520.21,open,erp
+AP-26-0067,Hollis Mushroom Farm Inc,HOL-5265,2026-03-03,2026-04-02,USD,3561.08,open,email
+AP-26-0068,Northgate Waste Services Inc,NOR-2128,2026-03-03,2026-04-02,USD,2746.30,open,email
+AP-26-0069,Calder Valley Dairy Co,CAL-7991,2026-03-04,2026-04-03,USD,7161.55,open,erp
+AP-26-0070,Kestrel Box & Carton Inc,CN-0091,03/04/2026,2026-03-04,USD,-180.00,open,email
+AP-26-0071,Pell & Hart Equipment Service LLC,PHE-2207,2026-03-04,2026-04-03,,2290.00,open,erp
+AP-26-0072,Larchmont Power and Light,LAR 6333,2026-03-04,2026-03-19,USD,22705.15,approved,email
+AP-26-0073,Tamsin County Water,tam-5953,2026-03-04,2026-03-19,USD,2394.41,approved,mail
+AP-26-0074,Calder Valley Dairy Co,CAL-7957,2026-03-05,2026-04-04,USD,2381.04,open,erp
+AP-26-0075,Marrow Creek Farms LLC,mar-2438,2026-03-05,2026-04-04,USD,8935.99,open,erp
+AP-26-0076,Ostrander Freight Lines Inc,OFL-30992,2026-03-05,2026-04-04,USD,7850.00,open,erp
+AP-26-0077,Pell & Hart Equipment Service LLC,PEL-3489,2026-03-05,2026-04-04,USD,3622.16,open,erp
+AP-26-0078,Brightwater Growers LLC,BRI-6939,2026-03-06,2026-04-05,,14041.39,open,erp
+AP-26-0079,CALDER VALLEY DAIRY,cvd-55821,2026-03-06,2026-04-05,,4300.00,open,erp
+AP-26-0080,Fenwick Cold Storage LLC,FEN-4228,2026-03-06,2026-04-05,USD,3098.04,open,erp
+AP-26-0081,Dunmore Forklift Service Inc,DUN-5378,2026-03-06,2026-04-05,USD,5148.94,open,email
+AP-26-0082,Juniper Hill Orchards Inc,JHO-7781,2026-03-08,2026-04-07,,12400.00,open,email
+AP-26-0083,Calder Valley Dairy Co.,cal-7934,2026-03-09,2026-04-08,USD,9822.52,open,erp
+AP-26-0084,BELLAMY REEFER TRANSPORT,BEL-2123,03/09/2026,2026-04-08,USD,"$7,079.51",open,erp
+AP-26-0085,Dunmore Forklift Service Inc,DUN-5446,2026-03-09,2026-04-08,USD,"$2,401.99",open,erp
+AP-26-0086,Linden Bend Farms Inc.,LIN-7875,2026-03-10,2026-04-09,USD,5347.62,open,erp
+AP-26-0087,Harlow Packaging Ltd,HAR-4717,2026-03-10,2026-04-09,USD,1428.44,open,email
+AP-26-0088,Oakhurst Containers Inc,OAK 2220,2026-03-10,2026-04-24,USD,8253.29,open,erp
+AP-26-0089,Kestrel Box & Carton Inc,KB-40217,2026-03-11,2026-04-10,USD,3960.00,open,email
+AP-26-0090,Fenwick Cold Storage LLC,fen-4260,2026-03-11,2026-04-10,USD,"$5,324.00",open,email
+AP-26-0091,Marrow Creek Farms LLC,MAR-2383,2026-03-13,2026-04-12,USD,6948.12,open,erp
+AP-26-0092,Kestrel Box & Carton Inc,KES-7511,2026-03-13,2026-04-12,USD,5211.60,open,erp
+AP-26-0093,Kestrel Box & Carton Inc,KES-7555,2026-03-13,2026-04-12,USD,5702.40,open,erp
+AP-26-0094,Pinecrest Labels Co,PIN-4097,2026-03-13,2026-04-12,USD,3014.86,open,email
+AP-26-0095,Vettori Refrigerazione S.r.l.,vet-2312,2026-03-13,2026-04-27,EUR,3962.41,open,email
+AP-26-0096,Linden Bend Farms Inc,LIN-7913,2026-03-15,2026-04-14,USD,7199.45,open,erp

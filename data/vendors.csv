@@ -1,0 +1,36 @@
+vendor_id,legal_name,trading_names,category,payment_terms,remit_to_account,contact_name,contact_phone,contact_email,email_domain,status
+V001,Brightwater Growers LLC,,growers,Net 30,QF-TEST-1948-5680,Wendell Thistle,(831) 555-0131,wendell@brightwatergrowers.example,brightwatergrowers.example,active
+V002,Calder Valley Dairy Co,,growers,NET30,QF-TEST-3312-0751,Rafael Bergstrom,(559) 555-0133,rafael@caldervalleydairy.example,caldervalleydairy.example,active
+V003,Juniper Hill Orchards Inc,,growers,2/10 NET30,QF-TEST-9908-5093,Hollis Vance,(831) 555-0196,hollis@juniperhill.example,juniperhill.example,active
+V004,Saskatoon Prairie Growers Ltd,,growers,NET30,QF-TEST-9119-8797,Yara Rourke,(916) 555-0111,yara@prairiegrowers.example,prairiegrowers.example,active
+V005,Marrow Creek Farms LLC,,growers,2/10 NET30,QF-TEST-4981-7378,Jonah Prentice,(831) 555-0102,jonah@marrowcreek.example,marrowcreek.example,active
+V006,Ashgrove Produce Co,Ashgrove Fresh,growers,NET30,QF-TEST-1775-8300,Jonah Kowalczyk,(831) 555-0186,jonah@ashgroveproduce.example,ashgroveproduce.example,active
+V007,Linden Bend Farms Inc,,growers,NET30,QF-TEST-5119-3497,Callum Sato,(559) 555-0192,callum@lindenbend.example,lindenbend.example,active
+V008,Copperfield Citrus LLC,,growers,Net 30,QF-TEST-6089-9654,Ines Quill,(831) 555-0108,ines@copperfieldcitrus.example,copperfieldcitrus.example,active
+V009,Hollis Mushroom Farm Inc,,growers,NET30,QF-TEST-1558-1600,Idris Halloran,(559) 555-0178,idris@hollismushroom.example,hollismushroom.example,active
+V010,Redd Mesa Onion Co,,growers,Net 30,QF-TEST-9700-2757,Celeste Halloran,(559) 555-0137,celeste@reddmesa.example,reddmesa.example,active
+V011,Wren Hollow Greens LLC,,growers,NET30,QF-TEST-5724-1331,Yara Duarte,(831) 555-0185,yara@wrenhollow.example,wrenhollow.example,active
+V012,Tolland Egg Farm Inc,,growers,NET30,QF-TEST-9506-7854,Ines Ashby,(916) 555-0125,ines@tollandeggs.example,tollandeggs.example,active
+V013,Harlow Packaging Ltd,,packaging,Net 30,QF-TEST-9204-4471,Priya Varga,(916) 555-0142,priya@harlowpackaging.example,harlowpackaging.example,active
+V014,Kestrel Box & Carton Inc,,packaging,2/10 NET30,QF-TEST-5572-6950,Yara Okafor,(916) 555-0191,yara@kestrelbox.example,kestrelbox.example,active
+V015,Mardale Films & Wraps LLC,,packaging,NET30,QF-TEST-4082-4890,Ines Bergstrom,(559) 555-0128,ines@mardalefilms.example,mardalefilms.example,active
+V016,Pinecrest Labels Co,,packaging,2/10 NET30,QF-TEST-8738-5201,Margit Bergstrom,(209) 555-0109,margit@pinecrestlabels.example,pinecrestlabels.example,active
+V017,Sutter Pallet Works Inc,,packaging,NET30,QF-TEST-6389-4303,Margit Castell,(209) 555-0157,margit@sutterpallet.example,sutterpallet.example,active
+V018,Oakhurst Containers Inc,,packaging,NET45,QF-TEST-5600-4767,Ottilie Halloran,(916) 555-0140,ottilie@oakhurstcontainers.example,oakhurstcontainers.example,active
+V019,Ostrander Freight Lines Inc,,freight,NET30,QF-TEST-9603-7743,Wendell Quill,(916) 555-0188,wendell@ostranderfreight.example,ostranderfreight.example,active
+V020,Fenwick Cold Storage LLC,,freight,NET30,QF-TEST-1954-0316,Desmond Halloran,(559) 555-0132,desmond@fenwickcold.example,fenwickcold.example,active
+V021,Bellamy Reefer Transport Inc,,freight,Net 30,QF-TEST-0430-8814,Noor Rourke,(559) 555-0171,noor@bellamyreefer.example,bellamyreefer.example,active
+V022,Greyling Logistics LLC,,freight,2/10 NET30,QF-TEST-0777-7696,Bram Vance,(916) 555-0181,bram@greylinglogistics.example,greylinglogistics.example,active
+V023,Coastline LTL Co,,freight,NET30,QF-TEST-0620-2684,Priya Bergstrom,(831) 555-0184,priya@coastlineltl.example,coastlineltl.example,active
+V024,Ridgeway Haulage Inc,,freight,NET30,QF-TEST-9025-5792,Yara Ferrante,(831) 555-0136,yara@ridgewayhaulage.example,ridgewayhaulage.example,active
+V025,Pell & Hart Equipment Service LLC,Pell and Hart,equipment_service,NET30,QF-TEST-6792-6086,Bram Sato,(209) 555-0189,bram@pellhart.example,pellhart.example,active
+V026,Vettori Refrigerazione S.r.l.,,equipment_service,NET45,QF-TEST-1200-9961,Ottilie Lindqvist,(916) 555-0101,ottilie@vettori-refrigerazione.example,vettori-refrigerazione.example,active
+V027,Dunmore Forklift Service Inc,,equipment_service,NET30,QF-TEST-6238-8497,Tobias Sato,(559) 555-0145,tobias@dunmoreforklift.example,dunmoreforklift.example,active
+V028,Castellan Electric Co,,equipment_service,NET45,QF-TEST-8973-4330,Priya Whitcombe,(916) 555-0156,priya@castellanelectric.example,castellanelectric.example,active
+V029,Halverson Facility Services LLC,,equipment_service,NET30,QF-TEST-8828-9881,Noor Castell,(209) 555-0147,noor@halversonfacility.example,halversonfacility.example,active
+V030,Larchmont Power & Light,,utilities,NET15,QF-TEST-4011-9800,Tobias Castell,(559) 555-0158,tobias@larchmontpower.example,larchmontpower.example,active
+V031,Tamsin County Water,,utilities,NET15,QF-TEST-3731-1332,Rafael Prentice,(559) 555-0176,rafael@tamsinwater.example,tamsinwater.example,active
+V032,Northgate Waste Services Inc,,utilities,Net 30,QF-TEST-4016-8462,Idris Ashby,(916) 555-0139,idris@northgatewaste.example,northgatewaste.example,active
+V033,Brandt Telecom LLC,,utilities,NET30,QF-TEST-2061-5668,Ines Rourke,(559) 555-0105,ines@brandttelecom.example,brandttelecom.example,active
+V034,Old Mill Packaging Co,,packaging,NET30,QF-TEST-1758-8987,Bram Varga,(831) 555-0127,bram@oldmillpackaging.example,oldmillpackaging.example,inactive
+V035,Ferris Produce LLC,,growers,NET30,QF-TEST-9474-5223,Idris Varga,(209) 555-0104,idris@ferrisproduce.example,ferrisproduce.example,inactive
