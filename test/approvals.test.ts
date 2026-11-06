@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import type { Action } from '../src/actions/schema';
 import type { RunResult } from '../src/agent/loop';
-import { emptyUsage } from '../src/agent/cost';
+import { emptyUsage } from '../src/llm/cost';
 import { detectIssues } from '../src/detect/index';
 import { approveAction, rejectAction, type ApprovalDeps } from '../src/work/approvals';
 import { mintCapability } from '../src/work/capability';
@@ -15,7 +15,7 @@ import { duplicateInvoices, facts, issueFor, scenario, sharedWorld, vendorRow } 
 
 function result(actions: Action[]): RunResult {
   return {
-    status: 'planned', failure: null, tool_calls: [], responses: [], usage: emptyUsage(), cost_usd: 0, duration_ms: 1, model: 'test',
+    status: 'planned', failure: null, tool_calls: [], usage: emptyUsage(), cost_usd: 0, cost_estimated: false, duration_ms: 1, model: 'test', transport: 'messages-api',
     plan: { summary: 's', options: [{ id: 'a', description: 'a', consequences: 'c', chosen: true }, { id: 'b', description: 'nothing', consequences: 'c', chosen: false }], outcome: 'act', rationale: 'r', actions, open_questions: [], evidence_ids: ['AP-26-0001'] },
   };
 }

@@ -14,9 +14,11 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "eval": "tsx evals/run.ts --live",
-    "eval:replay": "tsx evals/run.ts --replay"
+    "eval:replay": "tsx evals/run.ts --replay",
+    "extract": "tsx evals/run.ts --extract"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.319",
     "@anthropic-ai/sdk": "^1.6.0",
     "sql.js": "^1.15.2",
     "zod": "^4.6.7"

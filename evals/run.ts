@@ -1,31 +1,51 @@
 import { writeFileSync } from 'node:fs';
-import Anthropic from '@anthropic-ai/sdk';
 import { env, PATHS } from '../src/config';
-import { claudeExtractor } from '../src/extract/extract';
-import { runEvals } from './harness';
+import { extractAll, transportExtractor } from '../src/extract/extract';
+import { loadInbox } from '../src/ingest/build';
+import { liveTransport } from '../src/llm/live';
+import { CASES } from './cases';
+import { recordCases, runEvals, type EvalOptions } from './harness';
 import { renderReport } from './report';
 
-// npm run eval         live: extracts missing emails, runs the agent on every case, records the runs
-// npm run eval:replay  no key: replays the recordings with current code and grades them
+// npm run eval:replay                 grade every case from the recordings (no model calls)
+// npm run extract                     live: fill the email extraction cache only
+// npm run eval [-- --case <id> ...]   live: record the chosen cases (default all), then grade all
+//
+// Live runs go through the logged-in Claude Code CLI (LIVE_VIA_CLAUDE_CODE=1). The Messages
+// API path bills an API key, so it also needs --allow-api-billing.
 
-const mode = process.argv.includes('--live') ? 'live' : 'replay';
-const e = env();
-if (mode === 'live' && !e.apiKey) {
-  console.error('npm run eval makes paid API calls and needs ANTHROPIC_API_KEY. Use npm run eval:replay to grade the recordings without a key.');
+const args = process.argv.slice(2);
+const flag = (name: string) => args.includes(name);
+const mode = flag('--extract') ? 'extract' : flag('--live') ? 'live' : 'replay';
+const chosen = args.flatMap((a, i) => (args[i - 1] === '--case' ? [a] : []));
+const unknown = chosen.filter((id) => !CASES.some((c) => c.id === id));
+if (unknown.length) {
+  console.error(`Unknown case(s): ${unknown.join(', ')}. Cases: ${CASES.map((c) => c.id).join(', ')}`);
   process.exit(2);
 }
-const client = mode === 'live' ? new Anthropic({ apiKey: e.apiKey }) : null;
 
-const report = await runEvals({
-  mode,
-  dataDir: PATHS.data,
-  cachePath: PATHS.cache,
-  recordedDir: PATHS.recorded,
-  model: e.model,
-  effort: e.effort,
-  ...(client ? { api: client.messages, extractor: claudeExtractor(client, e.model, 'low') } : {}),
-});
+const opts: EvalOptions = { dataDir: PATHS.data, cachePath: PATHS.cache, recordedDir: PATHS.recorded };
 
+if (mode !== 'replay') {
+  const e = env();
+  if (!e.liveVia) fail('Live runs need LIVE_VIA_CLAUDE_CODE=1 (uses your Claude Code login). Use npm run eval:replay to grade recordings without a model.');
+  if (e.liveVia === 'messages-api' && !flag('--allow-api-billing')) fail('Only ANTHROPIC_API_KEY is set, which bills the API. Set LIVE_VIA_CLAUDE_CODE=1, or pass --allow-api-billing to use the key on purpose.');
+  const agent = liveTransport(e.liveVia, e.model, e.effort, e.apiKey)!;
+  const extraction = liveTransport(e.liveVia, e.model, 'low', e.apiKey)!;
+  console.log(`live via ${agent.name}, model ${e.model}, effort ${e.effort}`);
+
+  if (mode === 'extract') {
+    const emails = loadInbox(opts.dataDir);
+    const { missing } = await extractAll(emails, opts.cachePath, transportExtractor(extraction));
+    console.log(`${emails.length - missing.length}/${emails.length} emails extracted · ${opts.cachePath}`);
+    process.exit(0);
+  }
+  const cases = chosen.length ? CASES.filter((c) => chosen.includes(c.id)) : CASES;
+  await recordCases({ ...opts, cases }, { agent, extraction }, e.effort, (r) => console.log(`recorded  ${r.id}: ${r.status}${r.detail ? ` (${r.detail})` : ''}`));
+  console.log('');
+}
+
+const report = await runEvals(opts);
 writeFileSync('evals/results.md', renderReport(report));
 for (const r of report.results) {
   const why = [...r.detection.reasons, ...(r.decision?.reasons ?? []), ...(r.guardrails?.reasons ?? [])];
@@ -34,3 +54,8 @@ for (const r of report.results) {
 const failed = report.results.filter((r) => !r.pass).length;
 console.log(`\n${report.results.length - failed}/${report.results.length} cases pass · evals/results.md written`);
 process.exit(failed ? 1 : 0);
+
+function fail(message: string): never {
+  console.error(message);
+  process.exit(2);
+}

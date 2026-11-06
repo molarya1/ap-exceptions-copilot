@@ -1,5 +1,5 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import type { MessagesApi } from '../../src/agent/loop';
+import type { MessagesApi } from '../../src/llm/messages';
 import { message } from './fake-api';
 
 // A test-only stand-in for the model: a fixed policy per issue type that calls the real

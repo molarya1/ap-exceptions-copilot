@@ -11,12 +11,13 @@ import { openDb } from '../lib/sqlite';
 // work.db: runs, plans, actions, approvals, claims, outbox and the activity log.
 // Persists across restarts. Every write goes through tx(), which commits and saves.
 
+const SCHEMA_VERSION = 2;
 const WORK_SCHEMA = `
 CREATE TABLE IF NOT EXISTS issues (issue_id TEXT PRIMARY KEY, type TEXT NOT NULL, json TEXT NOT NULL, active INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS runs (
   run_id TEXT PRIMARY KEY, issue_id TEXT NOT NULL, mode TEXT NOT NULL, status TEXT NOT NULL, failure TEXT,
-  model TEXT NOT NULL, started_at TEXT NOT NULL, duration_ms INTEGER, tool_calls INTEGER,
-  input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER, cost_usd REAL,
+  model TEXT NOT NULL, transport TEXT NOT NULL, started_at TEXT NOT NULL, duration_ms INTEGER, tool_calls INTEGER,
+  input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER, cost_usd REAL, cost_estimated INTEGER NOT NULL,
   trail_json TEXT NOT NULL, result_hash TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS plans (plan_id TEXT PRIMARY KEY, run_id TEXT NOT NULL UNIQUE, issue_id TEXT NOT NULL, plan_json TEXT NOT NULL);
@@ -52,10 +53,12 @@ export interface RunRow {
   status: 'planned' | 'failed';
   failure: string | null;
   model: string;
+  transport: string;
   started_at: string;
   duration_ms: number;
   tool_calls: number;
   cost_usd: number | null;
+  cost_estimated: number;
   trail_json: string;
   result_hash: string;
 }
@@ -72,8 +75,15 @@ export class WorkStore {
   /** Opens work.db from disk (or in memory when path is null, for tests). */
   static async open(path: string | null): Promise<WorkStore> {
     const bytes = path && existsSync(path) ? readFileSync(path) : undefined;
-    const db = await openDb(bytes);
+    let db = await openDb(bytes);
+    // work.db is local demo state: one written by an older schema is set aside, not migrated.
+    if (bytes && db.get<{ user_version: number }>('PRAGMA user_version')!.user_version !== SCHEMA_VERSION) {
+      db.close();
+      renameSync(path!, `${path}.old`);
+      db = await openDb();
+    }
     db.exec(WORK_SCHEMA);
+    db.exec(`PRAGMA user_version = ${SCHEMA_VERSION}`);
     return new WorkStore(db, path);
   }
 
@@ -124,9 +134,9 @@ export class WorkStore {
       const runId = `${issueId}.r${n}`;
       const u = result.usage;
       this.db.run(
-        `INSERT INTO runs (run_id, issue_id, mode, status, failure, model, started_at, duration_ms, tool_calls, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, trail_json, result_hash)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [runId, issueId, mode, result.status, result.failure, result.model, now(), result.duration_ms, trail.length, u.input_tokens, u.output_tokens, u.cache_read_input_tokens, u.cache_creation_input_tokens, result.cost_usd, JSON.stringify(trail), resultHash],
+        `INSERT INTO runs (run_id, issue_id, mode, status, failure, model, transport, started_at, duration_ms, tool_calls, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, cost_estimated, trail_json, result_hash)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [runId, issueId, mode, result.status, result.failure, result.model, result.transport, now(), result.duration_ms, trail.length, u.input_tokens, u.output_tokens, u.cache_read_input_tokens, u.cache_creation_input_tokens, result.cost_usd, result.cost_estimated ? 1 : 0, JSON.stringify(trail), resultHash],
       );
       this.db.run("UPDATE actions SET status = 'superseded' WHERE issue_id = ? AND status = 'proposed'", [issueId]);
       if (result.plan) this.savePlan(runId, issueId, result.plan);

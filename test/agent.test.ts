@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { memoryAudit } from '../src/agent/audit';
 import { investigate, type RunDeps } from '../src/agent/loop';
 import { runQuery, readEmail, ToolError } from '../src/agent/tools';
+import { messagesTransport } from '../src/llm/messages';
 import { lastToolResults, scripted, type Turn } from './fixtures/fake-api';
 import { duplicateInvoices, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
 
@@ -10,7 +11,7 @@ async function deps(scenarioId: string, turns: Turn[], limits?: RunDeps['limits'
   const { facts, issues } = await sharedWorld();
   const api = scripted(turns);
   const audit = memoryAudit();
-  const d: RunDeps = { api, db: facts.db, issue: issueFor(issues, scenarioId), duplicateInvoices: duplicateInvoices(issues), model: 'claude-sonnet-5-5', effort: 'medium', audit, ...(limits ? { limits } : {}) };
+  const d: RunDeps = { transport: messagesTransport(api, 'claude-sonnet-5-5', 'medium'), db: facts.db, issue: issueFor(issues, scenarioId), duplicateInvoices: duplicateInvoices(issues), audit, ...(limits ? { limits } : {}) };
   return { d, api, audit, facts };
 }
 
@@ -34,8 +35,10 @@ test('a run investigates with tools and ends with an accepted plan', async () =>
   assert.equal(run.status, 'planned', run.failure ?? '');
   assert.equal(run.plan!.actions[0]!.type, 'schedule_payment');
   assert.deepEqual(run.tool_calls.map((c) => c.name), ['discount_value', 'submit_plan']);
-  assert.equal(run.responses.length, 2);
+  assert.equal(api.requests.length, 2);
   assert.equal(run.usage.input_tokens, 2000);
+  assert.equal(run.transport, 'messages-api');
+  assert.equal(run.cost_estimated, false);
   assert.ok(run.cost_usd !== null && run.cost_usd > 0);
   assert.ok(audit.events.some((e) => e.kind === 'plan_accepted'));
 
@@ -92,11 +95,12 @@ test('the tool budget is enforced, then the model may still submit', async () =>
 });
 
 test('a model that never submits fails after one nudge', async () => {
-  const { d } = await deps('discount_juniper', [() => [{ text: 'I think we should pay it.' }]]);
+  const { d, api } = await deps('discount_juniper', [() => [{ text: 'I think we should pay it.' }]]);
   const run = await investigate(d);
   assert.equal(run.status, 'failed');
   assert.match(run.failure!, /without submitting/);
-  assert.equal(run.responses.length, 2);
+  assert.equal(api.requests.length, 2);
+  assert.match(JSON.stringify(api.requests[1]!.messages.at(-1)), /Finish by calling submit_plan/);
 });
 
 test('the wall-clock deadline stops a run', async () => {

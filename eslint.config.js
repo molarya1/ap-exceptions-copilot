@@ -25,7 +25,7 @@ export default tseslint.config(
   },
   {
     // The agent proposes; only the HTTP layer may approve. Enforced at import level.
-    files: ['src/agent/**/*.ts', 'src/extract/**/*.ts'],
+    files: ['src/agent/**/*.ts', 'src/extract/**/*.ts', 'src/llm/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', { patterns: [{ group: ['**/work/approvals', '**/work/capability', '**/server/**'], message: 'Agent code must not reach approval or HTTP code.' }] }],
     },

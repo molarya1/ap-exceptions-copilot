@@ -1,5 +1,5 @@
 import type Anthropic from '@anthropic-ai/sdk';
-import type { MessagesApi } from '../../src/agent/loop';
+import type { MessagesApi } from '../../src/llm/messages';
 
 // A fake Messages API. Each turn is a function of the request so far, returning the
 // assistant's content blocks. Tool-use ids are generated, like the real API does.

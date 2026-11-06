@@ -30,8 +30,12 @@ export const PATHS = {
 };
 
 export function env() {
+  const apiKey = process.env.ANTHROPIC_API_KEY || undefined;
   return {
-    apiKey: process.env.ANTHROPIC_API_KEY || undefined,
+    apiKey,
+    // Live runs go through the logged-in Claude Code CLI when LIVE_VIA_CLAUDE_CODE=1 (the default
+    // live path); the Messages API is used only when a key is set without it.
+    liveVia: process.env.LIVE_VIA_CLAUDE_CODE === '1' ? ('claude-code' as const) : apiKey ? ('messages-api' as const) : null,
     model: process.env.AGENT_MODEL || 'claude-sonnet-5-5',
     effort: (process.env.AGENT_EFFORT || 'medium') as 'low' | 'medium' | 'high' | 'xhigh' | 'max',
     port: Number(process.env.PORT || 4310),

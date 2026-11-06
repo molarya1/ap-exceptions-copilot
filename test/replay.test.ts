@@ -30,7 +30,7 @@ test("a recorded plan that today's checks reject shows as failed, not valid", as
   const path = join(app.opts.recordedDir, `${issue.issue_id}.json`);
   // Simulate a recording whose plan pays the undiscounted total while claiming the discount.
   const rec = JSON.parse(readFileSync(path, 'utf8'));
-  const submit = rec.responses.at(-1).content.find((b: { name: string }) => b.name === 'submit_plan');
+  const submit = rec.tool_calls.findLast((c: { name: string }) => c.name === 'submit_plan');
   submit.input.actions[0].amount_cents += 100;
   writeFileSync(path, JSON.stringify(rec));
 

@@ -28,6 +28,7 @@ const TYPE_LABEL = {
   bank_change_request: 'Bank-detail change',
   suspicious_message: 'Suspicious email',
 };
+const TRANSPORT_LABEL = { 'claude-code': 'Claude Code', 'messages-api': 'Messages API', replay: 'replay' };
 const OUTCOME_LABEL = { act: 'Act', hold_and_ask: 'Hold and ask', no_action: 'No action' };
 
 const fields = (pairs) => h('dl', { class: 'fields' }, pairs.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)]));
@@ -146,7 +147,13 @@ async function renderIssue(id) {
     h('div', { class: 'grid two' }, evidence.map(evidenceCard)),
 
     run ? h('h2', {}, 'How the copilot got here') : null,
-    run ? h('p', { class: 'small muted' }, `${run.mode === 'replay' ? 'Replayed recording' : 'Live run'} · ${run.model} · ${run.tool_calls} tool calls · ${run.cost_usd === null ? 'cost n/a' : `$${run.cost_usd.toFixed(4)}`} · ${(run.duration_ms / 1000).toFixed(1)} s`) : null,
+    run ? h('p', { class: 'small muted' }, [
+      run.mode === 'replay' ? 'Replayed recording' : 'Live run',
+      `${run.model} via ${TRANSPORT_LABEL[run.transport] ?? run.transport}`,
+      `${run.tool_calls} tool calls`,
+      run.cost_usd === null ? 'cost n/a' : `${run.cost_estimated ? 'est. ' : ''}$${run.cost_usd.toFixed(4)}`,
+      `${(run.duration_ms / 1000).toFixed(1)} s`,
+    ].join(' · ')) : null,
     run ? h('div', { class: 'panel trail' }, table(['#', 'Tool', 'Input', 'Result'], run.trail.map((t, i) => [String(i + 1), t.tool, h('code', {}, t.input), t.result]))) : null,
   );
 }

@@ -1,4 +1,3 @@
-import type Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { AGENT_LIMITS } from '../config';
 import { discountValue } from '../calc/discount';
@@ -7,6 +6,7 @@ import type { CalcResults } from '../actions/preconditions';
 import { TABLE_GUIDE } from '../ingest/schema';
 import type { Db } from '../lib/sqlite';
 import { PlanSchema } from './plan';
+import type { ToolSpec } from '../llm/transport';
 
 // The tools are the only things the model can do. All of them read facts.db; none can
 // write anything. submit_plan is handled by the loop, which runs the checks.
@@ -32,18 +32,8 @@ const DESCRIPTIONS: Record<ToolName, string> = {
   submit_plan: 'Submit your decision. Code checks it; if there are problems they come back to you to fix. Call this exactly once you are done.',
 };
 
-function inputSchema(schema: z.ZodType): Anthropic.Tool.InputSchema {
-  const { $schema: _drop, ...json } = z.toJSONSchema(schema) as Record<string, unknown>;
-  return json as Anthropic.Tool.InputSchema;
-}
-
-/** Tool definitions in a fixed order; the last one carries the cache breakpoint. */
-export const TOOL_DEFS: Anthropic.Tool[] = (Object.keys(TOOL_INPUTS) as ToolName[]).map((name, i, all) => ({
-  name,
-  description: DESCRIPTIONS[name],
-  input_schema: inputSchema(TOOL_INPUTS[name]),
-  ...(i === all.length - 1 ? { cache_control: { type: 'ephemeral' as const } } : {}),
-}));
+/** Tool definitions in a fixed order, for any transport. */
+export const TOOL_SPECS: ToolSpec[] = (Object.keys(TOOL_INPUTS) as ToolName[]).map((name) => ({ name, description: DESCRIPTIONS[name], input: TOOL_INPUTS[name] }));
 
 /** What a run has learned from calculators, so checks can compare amounts. */
 export interface RunState {

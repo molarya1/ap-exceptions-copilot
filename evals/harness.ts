@@ -1,33 +1,30 @@
 import { join } from 'node:path';
 import type { Action } from '../src/actions/schema';
 import { memoryAudit } from '../src/agent/audit';
-import { investigate, type Effort, type MessagesApi, type RunResult } from '../src/agent/loop';
+import { investigate, type RunResult } from '../src/agent/loop';
 import { loadRecording, replayRun, saveRecording } from '../src/agent/replay';
 import { detectIssues } from '../src/detect/index';
 import type { Issue } from '../src/detect/types';
-import { extractAll, type ExtractionModel } from '../src/extract/extract';
+import { extractAll, transportExtractor } from '../src/extract/extract';
 import type { VerifiedExtraction } from '../src/extract/schema';
 import { buildFacts, loadInbox, type Facts } from '../src/ingest/build';
+import type { Effort, Transport } from '../src/llm/transport';
 import { approveAction, type ApprovalDeps } from '../src/work/approvals';
 import { mintCapability } from '../src/work/capability';
 import { WorkStore } from '../src/work/store';
 import { CASES, type EvalCase } from './cases';
 import { gradeDetection, gradePlan, targetIssue, type Grade } from './grade';
 
-// Runs every case: build facts (plus overlay), detect, then decide the case's issue either
-// live (recording the run) or from a recording. Every proposed action then goes through the
-// real approval path: forged, wrong-hash and stale approvals must be refused, the genuine
-// one must reach the outbox exactly once, and a second approval must be refused.
+// Two passes. `recordCases` runs the agent live on chosen cases and saves each run.
+// `runEvals` grades every case from the recordings: build facts (plus overlay), detect,
+// replay the decision with current code, then push every proposed action through the real
+// approval path: forged, wrong-hash and stale approvals must be refused, the genuine one
+// must reach the outbox exactly once, and a second approval must be refused.
 
 export interface EvalOptions {
-  mode: 'live' | 'replay';
   dataDir: string;
   cachePath: string;
   recordedDir: string;
-  model: string;
-  effort: Effort;
-  api?: MessagesApi; // live mode only
-  extractor?: ExtractionModel; // live mode only: fills the extraction cache
   cases?: EvalCase[];
 }
 
@@ -40,14 +37,15 @@ export interface CaseResult {
   guardrails: Grade | null;
   outcome: string | null;
   actions: string[];
+  model: string | null;
+  transport: string | null;
   tool_calls: number | null;
   cost_usd: number | null;
+  cost_estimated: boolean;
   duration_ms: number | null;
 }
 
 export interface EvalReport {
-  mode: 'live' | 'replay';
-  model: string;
   extraction_missing: string[];
   results: CaseResult[];
 }
@@ -55,17 +53,36 @@ export interface EvalReport {
 const recordingDir = (o: EvalOptions, c: EvalCase) => (c.overlay ? join(o.recordedDir, 'overlays', c.id) : o.recordedDir);
 const dupSet = (issues: Issue[]) => new Set(issues.filter((i) => i.type === 'duplicate_invoice').flatMap((i) => i.invoice_ids));
 
-async function decide(o: EvalOptions, c: EvalCase, facts: Facts, issues: Issue[], issue: Issue): Promise<RunResult | string> {
-  const deps = { db: facts.db, issue, duplicateInvoices: dupSet(issues), audit: memoryAudit() };
-  if (o.mode === 'live') {
-    const live = { ...deps, api: o.api!, model: o.model, effort: o.effort };
-    const result = await investigate(live);
-    saveRecording(recordingDir(o, c), issue.issue_id, live, facts.digest, result);
-    return result;
+async function world(o: EvalOptions, extractions: Map<string, VerifiedExtraction>, c: EvalCase): Promise<{ facts: Facts; issues: Issue[] }> {
+  const facts = await buildFacts(o.dataDir, extractions, c.overlay ? { overlaySql: c.overlay.sql } : {});
+  return { facts, issues: detectIssues(facts.db) };
+}
+
+export interface Recorded {
+  id: string;
+  status: RunResult['status'] | 'skipped';
+  detail: string | null;
+}
+
+/** Live pass: fills missing extractions, then runs and records the agent on each chosen case. */
+export async function recordCases(o: EvalOptions, live: { agent: Transport; extraction: Transport }, effort: Effort, onDone?: (r: Recorded) => void): Promise<Recorded[]> {
+  const { extractions } = await extractAll(loadInbox(o.dataDir), o.cachePath, transportExtractor(live.extraction));
+  const out: Recorded[] = [];
+  for (const c of o.cases ?? CASES) {
+    const { facts, issues } = await world(o, extractions, c);
+    const issue = c.expect.detected ? targetIssue(c, issues) : undefined;
+    let r: Recorded;
+    if (!issue) {
+      r = { id: c.id, status: 'skipped', detail: c.expect.detected ? 'expected issue was not detected' : 'detection-only case' };
+    } else {
+      const result = await investigate({ transport: live.agent, db: facts.db, issue, duplicateInvoices: dupSet(issues), audit: memoryAudit() });
+      saveRecording(recordingDir(o, c), issue.issue_id, effort, facts.digest, result);
+      r = { id: c.id, status: result.status, detail: result.failure };
+    }
+    out.push(r);
+    onDone?.(r);
   }
-  const rec = loadRecording(recordingDir(o, c), issue.issue_id);
-  if (!rec) return `no recording for ${issue.issue_id} in ${recordingDir(o, c)}; run \`npm run eval\` with ANTHROPIC_API_KEY set to record one`;
-  return replayRun(rec, deps);
+  return out;
 }
 
 /** SQL that makes an action stale: the invoice gets paid, or the vendor's phone on file changes. */
@@ -103,32 +120,34 @@ async function guardrails(o: EvalOptions, extractions: Map<string, VerifiedExtra
   return { pass: reasons.length === 0, reasons };
 }
 
+/** Replay pass: grades every case from its recording, with no model calls. */
 export async function runEvals(o: EvalOptions): Promise<EvalReport> {
-  const { extractions, missing } = await extractAll(loadInbox(o.dataDir), o.cachePath, o.mode === 'live' ? o.extractor : undefined);
+  const { extractions, missing } = await extractAll(loadInbox(o.dataDir), o.cachePath);
   const results: CaseResult[] = [];
 
   for (const c of o.cases ?? CASES) {
-    const facts = await buildFacts(o.dataDir, extractions, c.overlay ? { overlaySql: c.overlay.sql } : {});
-    const issues = detectIssues(facts.db);
-    const r: CaseResult = { id: c.id, tests: c.tests, pass: false, detection: gradeDetection(c, issues), decision: null, guardrails: null, outcome: null, actions: [], tool_calls: null, cost_usd: null, duration_ms: null };
+    const { facts, issues } = await world(o, extractions, c);
+    const r: CaseResult = {
+      id: c.id, tests: c.tests, pass: false, detection: gradeDetection(c, issues), decision: null, guardrails: null,
+      outcome: null, actions: [], model: null, transport: null, tool_calls: null, cost_usd: null, cost_estimated: false, duration_ms: null,
+    };
     const issue = c.expect.detected ? targetIssue(c, issues) : undefined;
 
     if (issue) {
-      const run = await decide(o, c, facts, issues, issue);
-      if (typeof run === 'string') {
-        r.decision = { pass: false, reasons: [run] };
+      const rec = loadRecording(recordingDir(o, c), issue.issue_id);
+      if (!rec) {
+        r.decision = { pass: false, reasons: [`no recording for ${issue.issue_id} in ${recordingDir(o, c)}; record it with \`npm run eval -- --case ${c.id}\``] };
       } else {
+        const run = await replayRun(rec, { db: facts.db, issue, duplicateInvoices: dupSet(issues), audit: memoryAudit() });
         r.decision = gradePlan(c, run.plan, run.failure);
         r.outcome = run.plan?.outcome ?? 'run failed';
         r.actions = run.plan?.actions.map((a) => a.type) ?? [];
-        r.tool_calls = run.tool_calls.length;
-        r.cost_usd = run.cost_usd;
-        r.duration_ms = run.duration_ms;
+        Object.assign(r, { model: rec.model, transport: rec.transport, tool_calls: rec.tool_calls.length, cost_usd: rec.cost_usd, cost_estimated: rec.cost_estimated, duration_ms: rec.duration_ms });
         if (run.plan) r.guardrails = await guardrails(o, extractions, c.overlay?.sql, facts, issues, issue.issue_id, run);
       }
     }
     r.pass = r.detection.pass && (r.decision?.pass ?? !c.expect.detected) && (r.guardrails?.pass ?? true);
     results.push(r);
   }
-  return { mode: o.mode, model: o.model, extraction_missing: missing, results };
+  return { extraction_missing: missing, results };
 }

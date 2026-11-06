@@ -3,7 +3,8 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { extractAll, type ExtractionModel } from '../src/extract/extract';
+import { extractAll, transportExtractor, type ExtractionModel } from '../src/extract/extract';
+import { fixtureExtractionTransport } from './fixtures/transports';
 import type { Extraction } from '../src/extract/schema';
 import { trustFlags } from '../src/extract/trust';
 import { verifyExtraction } from '../src/extract/verify';
@@ -73,4 +74,10 @@ test('verified extractions land in facts.db with their claimed bank account', as
   assert.deepEqual(row, { intent: 'bank_change', new_bank_account: s.facts.claimed_account });
   const flags = db.all<{ email_id: string; flag: string }>('SELECT email_id, flag FROM email_flags ORDER BY email_id, flag');
   assert.deepEqual(flags.map((f) => f.flag), ['embedded_instructions', 'lookalike_domain', 'reply_to_mismatch']);
+});
+
+test('extraction runs as a one-tool conversation over a transport', async () => {
+  const e = inbox[0]!;
+  const out = await transportExtractor(fixtureExtractionTransport()).extract(e);
+  assert.deepEqual(out, rawFixtureExtractions().get(e.emailId));
 });
