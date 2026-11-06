@@ -66,19 +66,23 @@ export function syntheticAccount(rng: Rng): string {
   return `QF-TEST-${String(rng.int(0, 9999)).padStart(4, '0')}-${String(rng.int(0, 9999)).padStart(4, '0')}`;
 }
 
+function unique<T>(used: Set<T>, draw: () => T): T {
+  for (;;) {
+    const value = draw();
+    if (!used.has(value)) {
+      used.add(value);
+      return value;
+    }
+  }
+}
+
 export function buildVendors(rng: Rng): Map<string, Vendor> {
   const vendors = new Map<string, Vendor>();
   const usedNames = new Set<string>();
   const usedPhones = new Set<number>();
   VENDOR_SEEDS.forEach((seed, i) => {
-    let contactName = '';
-    do contactName = `${rng.pick(FIRST)} ${rng.pick(LAST)}`;
-    while (usedNames.has(contactName));
-    usedNames.add(contactName);
-    let phone = 0;
-    do phone = rng.int(100, 199);
-    while (usedPhones.has(phone));
-    usedPhones.add(phone);
+    const contactName = unique(usedNames, () => `${rng.pick(FIRST)} ${rng.pick(LAST)}`);
+    const phone = unique(usedPhones, () => rng.int(100, 199));
     const first = contactName.split(' ')[0]!.toLowerCase();
     vendors.set(seed.key, {
       id: `V${String(i + 1).padStart(3, '0')}`,
