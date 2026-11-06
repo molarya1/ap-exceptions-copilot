@@ -3,7 +3,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { memoryAudit } from '../src/agent/audit';
-import { loadRecording, replayRun } from '../src/agent/replay';
+import { loadRecording, madeWithEarlierPrompt, replayRun } from '../src/agent/replay';
+import { issueView } from '../src/server/views';
 import { App } from '../src/app';
 import { testApp } from './fixtures/test-app';
 import { scenario } from './helpers';
@@ -47,4 +48,18 @@ test('replay re-runs calculators on current data: changed facts change the outco
   const changed = await App.boot({ ...app.opts, workPath: null, overlaySql: `INSERT INTO payments VALUES ('PAY-X', '${inv}', 100000, '2026-03-13', 'x', 'overlay')` });
   const run = changed.store.latestRun(`disc-${inv}`)!;
   assert.equal(run.status, 'failed');
+});
+
+test('a recording made with an earlier prompt still replays, and is marked as such', async () => {
+  const app = await testApp();
+  const issue = app.issues.find((i) => i.type === 'discount_expiring')!;
+  const path = join(app.opts.recordedDir, `${issue.issue_id}.json`);
+  const rec = JSON.parse(readFileSync(path, 'utf8'));
+  assert.equal(madeWithEarlierPrompt(rec), false);
+  rec.prompt_hash = 'an-older-prompt';
+  writeFileSync(path, JSON.stringify(rec));
+
+  const again = await App.boot({ ...app.opts, workPath: null });
+  assert.equal(again.store.latestRun(issue.issue_id)!.status, 'planned');
+  assert.equal(issueView(again, issue.issue_id)!.run!.earlier_prompt, true);
 });

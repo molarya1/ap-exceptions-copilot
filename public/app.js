@@ -153,7 +153,8 @@ async function renderIssue(id) {
       `${run.tool_calls} tool calls`,
       run.cost_usd === null ? 'cost n/a' : `${run.cost_estimated ? 'est. ' : ''}$${run.cost_usd.toFixed(4)}`,
       `${(run.duration_ms / 1000).toFixed(1)} s`,
-    ].join(' · ')) : null,
+      run.earlier_prompt ? 'recorded with an earlier prompt' : null,
+    ].filter(Boolean).join(' · ')) : null,
     run ? h('div', { class: 'panel trail' }, table(['#', 'Tool', 'Input', 'Result'], run.trail.map((t, i) => [String(i + 1), t.tool, h('code', {}, t.input), t.result]))) : null,
   );
 }

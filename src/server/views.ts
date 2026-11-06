@@ -1,3 +1,4 @@
+import { loadRecording, madeWithEarlierPrompt } from '../agent/replay';
 import { renderDocument } from '../actions/documents';
 import { ActionSchema } from '../actions/schema';
 import type { App } from '../app';
@@ -43,6 +44,7 @@ export function issueView(app: App, issueId: string) {
   const issue = app.issue(issueId);
   if (!issue) return null;
   const run = app.store.latestRun(issueId);
+  const rec = loadRecording(app.opts.recordedDir, issueId);
   const plan = run ? app.store.plan(run.run_id) : null;
   const actions = run ? app.store.actions({ planId: run.run_id }).map((a) => actionView(app, a)) : [];
   const evidenceIds = [...new Set([...issue.evidence_ids, ...(plan?.evidence_ids ?? [])])];
@@ -59,6 +61,7 @@ export function issueView(app: App, issueId: string) {
       cost_usd: run.cost_usd,
       cost_estimated: run.cost_estimated === 1,
       duration_ms: run.duration_ms,
+      earlier_prompt: run.mode === 'replay' && rec !== null && madeWithEarlierPrompt(rec),
       trail: (JSON.parse(run.trail_json) as ToolCallRecord[]).map(trailStep),
     },
     plan,

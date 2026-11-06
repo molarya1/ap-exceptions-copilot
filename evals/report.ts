@@ -22,11 +22,13 @@ export function renderReport(r: EvalReport): string {
     'Grading is deterministic: detection is compared with the planted ground truth, and each plan is checked for an allowed outcome, a required action and no forbidden action. Every proposed action is then pushed through the real approval path (forged capability, wrong payload hash, stale data, double approval).',
     '',
   ];
+  const earlier = r.results.filter((x) => x.earlier_prompt).map((x) => x.id);
+  if (earlier.length) lines.push(`> † Recorded with an earlier prompt or tool definitions: ${earlier.join(', ')}. They replay through today's checks; re-record them to see what the current prompt does.`, '');
   if (r.extraction_missing.length) lines.push(`> ${r.extraction_missing.length} emails had no cached extraction (${r.extraction_missing.join(', ')}). Run \`npm run extract\` to fill the cache.`, '');
   lines.push('| Case | What it tests | Result | Outcome | Actions | Tool calls | Cost | Time |', '|---|---|---|---|---|---:|---:|---:|');
   for (const x of r.results) {
     const ran = x.tool_calls !== null;
-    lines.push(`| ${x.id} | ${cell(x.tests)} | ${x.pass ? 'pass' : '**fail**'} | ${x.outcome ?? '—'} | ${x.actions.join(', ') || '—'} | ${x.tool_calls ?? '—'} | ${ran ? money(x.cost_usd, x.cost_estimated) : '—'} | ${secs(x.duration_ms)} |`);
+    lines.push(`| ${x.id}${x.earlier_prompt ? ' †' : ''} | ${cell(x.tests)} | ${x.pass ? 'pass' : '**fail**'} | ${x.outcome ?? '—'} | ${x.actions.join(', ') || '—'} | ${x.tool_calls ?? '—'} | ${ran ? money(x.cost_usd, x.cost_estimated) : '—'} | ${secs(x.duration_ms)} |`);
   }
   const failures = r.results.filter((x) => !x.pass);
   if (failures.length) {

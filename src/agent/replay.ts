@@ -66,6 +66,12 @@ export function loadRecording(dir: string, issueId: string): Recording | null {
   return rec.format === 2 ? rec : null;
 }
 
+/**
+ * True when the recording was made with a different system prompt or tool definitions.
+ * Replay still runs it: only today's checks decide whether its plan stands.
+ */
+export const madeWithEarlierPrompt = (rec: Recording) => rec.prompt_hash !== promptHash();
+
 const ENDED = 'the recording ended';
 
 /** Plays the recorded tool calls, in order, into the loop's tool handler. */

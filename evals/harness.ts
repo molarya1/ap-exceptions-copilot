@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import type { Action } from '../src/actions/schema';
 import { memoryAudit } from '../src/agent/audit';
 import { investigate, type RunResult } from '../src/agent/loop';
-import { loadRecording, replayRun, saveRecording } from '../src/agent/replay';
+import { loadRecording, madeWithEarlierPrompt, replayRun, saveRecording } from '../src/agent/replay';
 import { detectIssues, duplicateCopies } from '../src/detect/index';
 import type { Issue } from '../src/detect/types';
 import { extractAll, transportExtractor } from '../src/extract/extract';
@@ -43,6 +43,7 @@ export interface CaseResult {
   cost_usd: number | null;
   cost_estimated: boolean;
   duration_ms: number | null;
+  earlier_prompt: boolean;
 }
 
 export interface EvalReport {
@@ -128,7 +129,7 @@ export async function runEvals(o: EvalOptions): Promise<EvalReport> {
     const { facts, issues } = await world(o, extractions, c);
     const r: CaseResult = {
       id: c.id, tests: c.tests, pass: false, detection: gradeDetection(c, issues), decision: null, guardrails: null,
-      outcome: null, actions: [], model: null, transport: null, tool_calls: null, cost_usd: null, cost_estimated: false, duration_ms: null,
+      outcome: null, actions: [], model: null, transport: null, tool_calls: null, cost_usd: null, cost_estimated: false, duration_ms: null, earlier_prompt: false,
     };
     const issue = c.expect.detected ? targetIssue(c, issues) : undefined;
 
@@ -141,7 +142,7 @@ export async function runEvals(o: EvalOptions): Promise<EvalReport> {
         r.decision = gradePlan(c, run.plan, run.failure);
         r.outcome = run.plan?.outcome ?? 'run failed';
         r.actions = run.plan?.actions.map((a) => a.type) ?? [];
-        Object.assign(r, { model: rec.model, transport: rec.transport, tool_calls: rec.tool_calls.length, cost_usd: rec.cost_usd, cost_estimated: rec.cost_estimated, duration_ms: rec.duration_ms });
+        Object.assign(r, { model: rec.model, transport: rec.transport, tool_calls: rec.tool_calls.length, cost_usd: rec.cost_usd, cost_estimated: rec.cost_estimated, duration_ms: rec.duration_ms, earlier_prompt: madeWithEarlierPrompt(rec) });
         if (run.plan) r.guardrails = await guardrails(o, extractions, c.overlay?.sql, facts, issues, issue.issue_id, run);
       }
     }
