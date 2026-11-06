@@ -15,21 +15,27 @@ export const SchedulePayment = z.object({
   pay_to_account: account.describe("The vendor's remit_account on file."),
 });
 
-export const HoldPayment = z.object({
-  type: z.literal('hold_payment'),
-  invoice_id: z.string(),
-  reason: z.string(),
-});
+export const HoldPayment = z
+  .object({
+    type: z.literal('hold_payment'),
+    invoice_id: z.string(),
+    reason: z.string(),
+  })
+  .describe('Internal: takes the invoice out of this payment run. Nothing is sent to the vendor.');
 
-export const ShortPay = z.object({
-  type: z.literal('short_pay'),
-  invoice_id: z.string(),
-  pay_cents: cents.describe('From match_check.payable_cents.'),
-  disputed_cents: cents.describe('From match_check.disputed_cents.'),
-  currency: z.string(),
-  pay_to_account: account.describe("The vendor's remit_account on file."),
-  reason: z.string(),
-});
+export const ShortPay = z
+  .object({
+    type: z.literal('short_pay'),
+    invoice_id: z.string(),
+    pay_cents: cents.describe('From match_check.payable_cents.'),
+    disputed_cents: cents.describe('From match_check.disputed_cents.'),
+    currency: z.string(),
+    pay_to_account: account.describe("The vendor's remit_account on file."),
+    reason: z.string().describe('Printed on the remittance advice the vendor receives.'),
+  })
+  .describe(
+    'Visible to the vendor: pays the matched amount and sends the vendor a remittance advice showing disputed_cents withheld, with the reason. It is a dispute the vendor sees. Use hold_payment instead when the amount should not be disputed with the vendor.',
+  );
 
 export const RequestCreditNote = z.object({
   type: z.literal('request_credit_note'),

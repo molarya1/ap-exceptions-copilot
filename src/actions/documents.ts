@@ -33,17 +33,20 @@ export function renderDocument(a: Action, db: Db): ActionDocument {
     }
     case 'short_pay': {
       const inv = invoice(a.invoice_id);
+      const to = inv ? db.get<{ contact_email: string }>('SELECT contact_email FROM vendors WHERE vendor_id = ?', [inv.vendor_id])?.contact_email : undefined;
+      const no = inv?.vendor_invoice_no ?? a.invoice_id;
       return {
         kind: 'payment_run_entry',
         title: `Short-pay ${a.invoice_id} in the ${BUSINESS_DATE} run`,
         fields: [
           ['Vendor', inv ? vendor(inv.vendor_id) : '?'],
-          ['Invoice', `${a.invoice_id} (vendor no. ${inv?.vendor_invoice_no ?? '?'})`],
+          ['Invoice', `${a.invoice_id} (vendor no. ${no})`],
           ['Pay now', formatCents(a.pay_cents, a.currency)],
-          ['Disputed, recorded as open', formatCents(a.disputed_cents, a.currency)],
+          ['Withheld as disputed', formatCents(a.disputed_cents, a.currency)],
           ['Pay to account', a.pay_to_account],
-          ['Reason', a.reason],
+          ['Vendor sees', `Remittance advice to ${to ?? 'the contact on file'} showing the withheld amount and reason`],
         ],
+        body: `Remittance advice from ${COMPANY.name}\n\nInvoice ${no}: paid ${formatCents(a.pay_cents, a.currency)}. Withheld ${formatCents(a.disputed_cents, a.currency)} as disputed.\nReason: ${a.reason}`,
       };
     }
     case 'hold_payment':
