@@ -8,7 +8,7 @@ export default tseslint.config(
   {
     languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
   {

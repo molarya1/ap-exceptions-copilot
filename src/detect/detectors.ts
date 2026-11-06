@@ -106,16 +106,17 @@ export function detectExpiringDiscounts(db: Db): DetectedIssue[] {
   for (const r of rows) {
     const d = discountValue(db, r.invoice_id);
     if (!d?.must_pay_this_run_to_capture) continue;
+    const emails = relatedEmails(db, r.vendor_id, [r.invoice_no_key]);
     out.push({
       issue_id: `disc-${r.invoice_id}`,
       type: 'discount_expiring',
       title: `${formatCents(d.discount_cents)} discount on ${r.invoice_id} (${r.vendor_invoice_no}) from ${r.legal_name} ends ${d.discount_deadline}, before the ${NEXT_RUN_DATE} run`,
       vendor_id: r.vendor_id,
       invoice_ids: [r.invoice_id],
-      email_ids: [],
+      email_ids: emails,
       money_at_risk_usd_cents: d.discount_cents,
       deadline: d.discount_deadline!,
-      evidence_ids: [r.invoice_id],
+      evidence_ids: [r.invoice_id, ...emails],
       details: { terms: d.terms, discount_cents: d.discount_cents, pay_with_discount_cents: d.pay_with_discount_cents, annualized_return_pct: d.annualized_return_pct },
     });
   }
