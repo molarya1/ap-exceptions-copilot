@@ -13,7 +13,7 @@ export default tseslint.config(
   },
   {
     files: ['public/**/*.js'],
-    languageOptions: { globals: { document: 'readonly', window: 'readonly', fetch: 'readonly', location: 'readonly', history: 'readonly' } },
+    languageOptions: { globals: { document: 'readonly', window: 'readonly', fetch: 'readonly', location: 'readonly', Node: 'readonly', setTimeout: 'readonly' } },
   },
   {
     // Only the HTTP layer may mint a human capability.

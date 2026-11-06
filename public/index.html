@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AP Exceptions Copilot</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <strong>AP Exceptions Copilot</strong>
+      <span class="muted" id="context"></span>
+    </div>
+    <nav>
+      <a href="#/" data-nav="queue">Queue</a>
+      <a href="#/approvals" data-nav="approvals">Approvals <span id="pending-count" class="count"></span></a>
+    </nav>
+  </header>
+  <div id="banner" class="banner" hidden></div>
+  <main id="view" aria-live="polite"></main>
+</body>
+</html>
