@@ -97,7 +97,7 @@ export function plantScenarios(ctx: Ctx): { truths: ScenarioTruth[]; noise: Emai
     ]);
     receive(ctx, po, '2026-02-24');
     const inv = addInvoice(ctx, bw, { number: 'BG-2026-0318', date: '2026-02-25', lines: linesFromPo(po, [{ priceCents: 1985 }]) });
-    truths.push({ id: 'price_variance', kind: 'match_exception', summary: 'Roma tomatoes invoiced at $19.85 per case against a PO price of $18.40 (300 cases, $435.00 over).', vendorId: bw.id, invoices: [inv], emails: [], facts: { po_line_id: po.lines[0]!.id, overbilled_cents: 300 * (1985 - 1840) } });
+    truths.push({ id: 'price_variance', kind: 'match_exception', summary: 'Roma tomatoes invoiced at $19.85 per case against a PO price of $18.40 (300 cases, $435.00 over).', vendorId: bw.id, invoices: [inv], emails: [], facts: { po_line_id: po.lines[0]!.id, overbilled_cents: 300 * (1985 - 1840), buyer: po.buyer } });
   }
 
   // 3. Quantity variance: 200 cases billed, 160 received. The vendor says the rest shipped.

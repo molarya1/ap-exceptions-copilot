@@ -1,4 +1,4 @@
-import { BUSINESS_DATE, DUPLICATE_WINDOW_DAYS, NEXT_RUN_DATE } from '../config';
+import { BUSINESS_DATE, COMPANY, DUPLICATE_WINDOW_DAYS, NEXT_RUN_DATE } from '../config';
 import { discountValue } from '../calc/discount';
 import { matchCheck } from '../calc/match';
 import { invoiceNumberKey } from '../ingest/clean';
@@ -190,12 +190,14 @@ function earlierBankNotes(db: Db, e: FlaggedEmail): string[] {
     .map((r) => r.email_id);
 }
 
-/** Emails from the vendor's own domain that cite one of these invoice numbers. */
+/** Emails from the vendor's own domain, or from colleagues, that cite one of these invoice numbers. */
 function relatedEmails(db: Db, vendorId: string, keys: string[]): string[] {
   const rows = db.all<{ email_id: string; value: string }>(
-    `SELECT DISTINCT c.email_id, c.value FROM email_claims c JOIN emails e USING (email_id) JOIN vendors v ON v.email_domain = e.from_domain
-     WHERE v.vendor_id = ? AND c.kind = 'invoice_number' ORDER BY c.email_id`,
-    [vendorId],
+    `SELECT DISTINCT c.email_id, c.value FROM email_claims c JOIN emails e USING (email_id)
+     WHERE c.kind = 'invoice_number'
+       AND (e.from_domain = (SELECT email_domain FROM vendors WHERE vendor_id = ?) OR e.from_domain = ?)
+     ORDER BY c.email_id`,
+    [vendorId, COMPANY.domain],
   );
   return [...new Set(rows.filter((r) => keys.includes(invoiceNumberKey(r.value))).map((r) => r.email_id))];
 }

@@ -32,7 +32,8 @@
       "email_ids": [],
       "facts": {
         "po_line_id": "PO-24076-1",
-        "overbilled_cents": 43500
+        "overbilled_cents": 43500,
+        "buyer": "Dana Pryce"
       }
     },
     {

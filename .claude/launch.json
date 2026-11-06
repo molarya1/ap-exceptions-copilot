@@ -1,7 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "dev-demo", "runtimeExecutable": "npx", "runtimeArgs": ["tsx", ".local/dev-demo.mts"], "port": 4311 },
-    { "name": "app", "runtimeExecutable": "npm", "runtimeArgs": ["start"], "port": 4310 }
-  ]
-}
