@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { memoryAudit } from '../src/agent/audit';
 import { investigate, type RunDeps } from '../src/agent/loop';
-import { runQuery, readEmail, ToolError } from '../src/agent/tools';
+import { runQuery, readEmail, senderOf, ToolError } from '../src/agent/tools';
 import { messagesTransport } from '../src/llm/messages';
 import { lastToolResults, scripted, type Turn } from './fixtures/fake-api';
 import { duplicateCopies, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
@@ -148,5 +148,15 @@ test('read_email marks the text as untrusted and shows the trust flags', async (
   const e = readEmail(facts.db, scenario('bank_change_fraud').email_ids[0]!) as { text: string; trust_flags: unknown[]; warning: string };
   assert.match(e.text, /^<untrusted_email id="m\d+">/);
   assert.equal(e.trust_flags.length, 2);
-  assert.match(e.warning, /Untrusted/);
+  assert.match(e.warning, /^Untrusted email content/);
+  assert.deepEqual((e as unknown as { sender: unknown }).sender, { kind: 'unknown' });
+});
+
+test('read_email says who sent it: a colleague, a known vendor, or unknown', async () => {
+  const { facts } = await sharedWorld();
+  const sender = (id: string) => (readEmail(facts.db, id) as { sender: { kind: string; vendor_id?: string } }).sender;
+  const genuine = scenario('bank_change_genuine');
+  assert.deepEqual(sender(genuine.email_ids.at(-1)!), { kind: 'known_vendor', vendor_id: genuine.vendor_id });
+  assert.deepEqual(senderOf(facts.db, 'quillfeather.example'), { kind: 'internal' });
+  assert.deepEqual(senderOf(facts.db, 'ostranderfrieght.example'), { kind: 'unknown' });
 });

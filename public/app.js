@@ -110,7 +110,7 @@ function evidenceCard(c) {
     c.flags && c.flags.length ? h('div', {}, c.flags.map((f) => h('span', { class: 'chip flag', title: f.detail }, f.flag))) : null,
     fields(c.fields),
     c.table ? table(c.table.head, c.table.rows) : null,
-    c.text ? h('pre', { class: 'untrusted', title: 'Untrusted vendor text' }, c.text) : null);
+    c.text ? h('pre', { class: 'untrusted', title: 'Untrusted email text' }, c.text) : null);
 }
 
 async function renderIssue(id) {
