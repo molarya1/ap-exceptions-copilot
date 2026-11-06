@@ -23,15 +23,18 @@ npm start
 Open http://localhost:4310. No API key is needed: the app replays recorded agent runs, and every
 replay goes back through the current tools, calculators and checks. Node 20 or newer.
 
-With `ANTHROPIC_API_KEY` set (see `.env.example`), issues that have no recording are investigated
-live in the background and recorded.
+To run live, set `LIVE_VIA_CLAUDE_CODE=1` (see `.env.example`). Live runs then go through your
+logged-in Claude Code CLI via the Agent SDK, so they use your subscription rather than API
+billing, and issues without a recording are investigated in the background and recorded. An
+`ANTHROPIC_API_KEY` works too, through the Messages API, but is billed per token.
 
 | Command | What it does |
 |---|---|
 | `npm start` | Build the facts, detect issues, replay recordings, serve the UI on localhost |
 | `npm test` | Unit and integration tests (no key, no network) |
-| `npm run eval:replay` | Grade the recorded runs with current code (no key) |
-| `npm run eval` | Re-run every eval case live and record it (paid) |
+| `npm run eval:replay` | Grade every eval case from its recording with current code (no model calls) |
+| `npm run extract` | Live: fill the email extraction cache |
+| `npm run eval -- --case <id>` | Live: record one eval case (or all, without `--case`), then grade all |
 | `npm run generate` | Regenerate the seeded data in `data/` |
 
 ## How it works
@@ -116,11 +119,17 @@ to a vendor.
   sees issues worth its time, one at a time, with a brief and tools instead of the whole database.
 - **Plans, not actions.** The model submits one structured plan with options compared. Checks give
   it specific reasons to fix, which is cheaper and safer than letting it call write tools.
-- **Recordings over mocks.** Replaying real model responses through current code catches the
-  regressions that matter (a tightened check now rejects an old plan) without paying per CI run.
+- **Recordings over mocks.** A recording is the ordered tool calls of a live run, not raw API
+  traffic. Replay issues those calls again, so tools, calculators and checks run with current code
+  on current data, and a tightened check that now rejects an old plan fails the run. Recordings
+  from either transport replay the same way, and CI pays nothing.
+- **One small transport interface.** The loop hands a transport a system prompt, a user message,
+  tool definitions, a `call(name, input)` function and a deadline. Limits, checks and the audit log
+  live in the loop, so Claude Code (Agent SDK, in-process MCP server with only our tools) and the
+  Messages API behave the same. Email extraction uses the same interface with one tool.
 - **SQLite in memory (sql.js).** No native build step, so `npm install && npm start` works anywhere.
   `work.db` is written with an atomic rename after each transaction.
-- **Small on purpose.** No framework on the front end, no build step, about 3,700 lines of TypeScript in `src/`.
+- **Small on purpose.** No framework on the front end, no build step, about 4,000 lines of TypeScript in `src/`.
 
 What production would add: Postgres instead of files; a durable queue for investigations with
 retries; per-tenant budgets and rate limits; real identity and roles for approvers; re-running an
@@ -136,6 +145,7 @@ src/extract   email extraction, quote verification, trust flags, cache
 src/detect    detectors and ranking
 src/calc      three-way match and discount calculators
 src/agent     prompt, tools, plan checks, tool loop, recording and replay
+src/llm       transports (Claude Code via the Agent SDK, Messages API), cost
 src/actions   action schemas, preconditions, rendered documents
 src/work      work.db, capability, approvals, outbox
 src/server    HTTP server and view models
@@ -148,7 +158,7 @@ All companies, people, domains (`.example`) and account numbers (`QF-TEST-…`) 
 ## What's left
 
 The extraction cache (`cache/extractions.json`) and the agent recordings (`recorded/`) come from
-paid API runs and haven't been made yet. Until they exist, `npm start` shows the queue without
-the email-based issues or decisions, and `npm run eval:replay` (and so CI) fails with "no
-recording" messages. Running `npm run eval` once with a key fills both, writes
-`evals/results.md`, and is the last step before adding the screenshot.
+live runs and haven't been made yet. Until they exist, `npm start` shows the queue without the
+email-based issues or decisions, and `npm run eval:replay` (and so CI) fails with "no recording"
+messages. `npm run extract` and `npm run eval` with `LIVE_VIA_CLAUDE_CODE=1` fill both and write
+`evals/results.md`; then the screenshot goes in.
