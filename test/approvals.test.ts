@@ -39,8 +39,9 @@ test('approve-and-send works once and writes one outbox row', async () => {
   const { deps, action, store } = await setup();
   const first = approveAction(human(), deps, action.action_id, action.payload_hash);
   assert.equal(first.ok, true);
-  const outbox = store.db.all<{ kind: string; document_json: string }>('SELECT kind, document_json FROM outbox');
+  const outbox = store.db.all<{ outbox_id: number; kind: string; document_json: string }>('SELECT outbox_id, kind, document_json FROM outbox');
   assert.equal(outbox.length, 1);
+  assert.deepEqual(first, { ok: true, outboxId: outbox[0]!.outbox_id });
   assert.equal(outbox[0]!.kind, 'payment_run_entry');
   assert.match(outbox[0]!.document_json, /\$12,152\.00/);
 

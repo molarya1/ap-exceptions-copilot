@@ -77,8 +77,9 @@ export function approveAction(cap: unknown, deps: ApprovalDeps, actionId: string
       deps.store.db.run("UPDATE actions SET status = 'approved' WHERE action_id = ? AND status = 'proposed'", [actionId]);
       deps.store.db.run("INSERT INTO approvals (action_id, decision, payload_hash, session_id, at) VALUES (?, 'approved', ?, ?, ?)", [actionId, shownHash, sessionId, at]);
       deps.store.db.run('INSERT INTO outbox (action_id, kind, document_json, at) VALUES (?, ?, ?, ?)', [actionId, document.kind, JSON.stringify(document), at]);
-      deps.store.logInTx(`session:${sessionId}`, 'action_approved', { action_id: actionId, claim: key });
-      return deps.store.db.get<{ id: number }>('SELECT last_insert_rowid() AS id')!.id;
+      const { outbox_id } = deps.store.db.get<{ outbox_id: number }>('SELECT outbox_id FROM outbox WHERE action_id = ?', [actionId])!;
+      deps.store.logInTx(`session:${sessionId}`, 'action_approved', { action_id: actionId, claim: key, outbox_id });
+      return outbox_id;
     });
     return { ok: true, outboxId };
   } catch (err) {
