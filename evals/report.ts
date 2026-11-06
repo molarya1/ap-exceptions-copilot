@@ -1,4 +1,5 @@
 import type { EvalReport } from './harness';
+import { relative } from 'node:path';
 import { outcomeMix, type Variance } from './repeat';
 
 // evals/results.md, always from the replay pass. Tool calls, cost and time are the live
@@ -52,7 +53,9 @@ export function renderReport(r: EvalReport, variance: Variance | null = null): s
       ...variance.cases.map((c) => `| ${c.id} | ${c.passes}/${c.runs} | ${outcomeMix(c.outcomes)} |`),
     );
     const failing = variance.cases.filter((c) => c.failures.length);
-    if (failing.length) lines.push('', ...failing.flatMap((c) => c.failures.map((f) => `- **${c.id}** ${cell(f)}`)));
+    // Links are relative to evals/, where results.md lives.
+    const link = (path: string | null) => (path ? ` ([recording](${relative('evals', path)}))` : ' (recording not kept)');
+    if (failing.length) lines.push('', ...failing.flatMap((c) => c.failures.map((f) => `- **${c.id}** run ${f.run}: ${cell(f.reason)}${link(f.recording)}`)));
   }
   return lines.join('\n') + '\n';
 }

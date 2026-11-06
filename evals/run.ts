@@ -49,10 +49,10 @@ if (mode !== 'replay') {
   }
   const cases = chosen.length ? CASES.filter((c) => chosen.includes(c.id)) : CASES;
   if (repeat) {
-    const v = await repeatCases({ ...opts, cases }, { agent, extraction }, e.effort, repeat, flag('--keep-if-all-pass'), (i, id, pass, outcome) => console.log(`run ${i}  ${pass ? 'pass' : 'FAIL'}  ${id} (${outcome})`));
+    const v = await repeatCases({ ...opts, cases }, { agent, extraction }, e.effort, { n: repeat, keep: flag('--keep-if-all-pass') }, (i, id, pass, outcome) => console.log(`run ${i}  ${pass ? 'pass' : 'FAIL'}  ${id} (${outcome})`));
     saveVariance(v);
     console.log('');
-    for (const c of v.cases) console.log(`${c.passes}/${c.runs}  ${c.id}${c.kept ? '  (last run kept as the recording)' : ''}`);
+    for (const c of v.cases) console.log(`${c.passes}/${c.runs}  ${c.id}${c.kept ? '  (last run kept as the recording)' : ''}${c.failures.length ? `  failed runs kept: ${c.failures.map((f) => f.recording ?? `run ${f.run} (no recording)`).join(', ')}` : ''}`);
     console.log(`\n${VARIANCE_PATH} written\n`);
   } else await recordCases({ ...opts, cases }, { agent, extraction }, e.effort, (r) => console.log(`recorded  ${r.id}: ${r.status}${r.detail ? ` (${r.detail})` : ''}`));
   console.log('');
