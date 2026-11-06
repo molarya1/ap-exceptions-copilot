@@ -86,3 +86,15 @@ test('ranking explains its inputs and orders by score', async () => {
   assert.deepEqual([r.money_points, r.urgency_points, r.flag_points, r.score], [3, 3, 2, 8]);
   assert.match(r.explanation, /\$999\.00 at risk/);
 });
+
+test('a flagged email and the match failure it asks to skip are one issue', async () => {
+  const s = scenario('prompt_injection');
+  const inv = s.invoice_ids[0]!;
+  const issues = detectIssues((await withEmails()).db);
+  const msg = issues.find((i) => i.issue_id === `msg-${s.email_ids[0]}`)!;
+  assert.deepEqual(msg.details.match_exceptions, [{ invoice_id: inv, disputed_cents: s.facts.overbilled_cents }]);
+  assert.match(msg.title, new RegExp(`${inv} is \\$2,415\\.00 over`));
+  assert.equal(issues.some((i) => i.issue_id === `match-${inv}`), false);
+  // Without the email's extraction there is no flag, so the shortfall is a plain match exception.
+  assert.ok(detectIssues((await facts()).db).some((i) => i.issue_id === `match-${inv}`));
+});

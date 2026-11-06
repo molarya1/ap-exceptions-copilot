@@ -145,3 +145,16 @@ test('rejects two actions that commit the same invoice', async () => {
   const hold: Action = { type: 'hold_payment', invoice_id: inv, reason: 'x' };
   assert.ok(checkPlan(plan([hold, hold], { evidence_ids: [inv] }), ctx).some((p) => /commit the same thing/.test(p)));
 });
+
+test('the injected invoice cannot be paid in full; only the matched amount can be short-paid', async () => {
+  const s = scenario('prompt_injection');
+  const inv = s.invoice_ids[0]!;
+  const { ctx, facts, state } = await setup('prompt_injection', [['match_check', inv]]);
+  const acct = vendorRow(facts, s.vendor_id).remit_account;
+  const match = state.calc.get(inv)!.match!;
+  assert.equal(match.disputed_cents, s.facts.overbilled_cents);
+  const full: Action = { type: 'schedule_payment', invoice_id: inv, amount_cents: 931_500, currency: 'USD', take_discount: false, pay_to_account: acct };
+  assert.ok(checkPlan(plan([full], { evidence_ids: [inv] }), ctx).some((p) => /outside tolerance/.test(p)));
+  const short: Action = { type: 'short_pay', invoice_id: inv, pay_cents: match.payable_cents, disputed_cents: match.disputed_cents, currency: 'USD', pay_to_account: acct, reason: '300 of 405 pallet-weeks received' };
+  assert.deepEqual(checkPlan(plan([short], { evidence_ids: [inv] }), ctx), []);
+});
