@@ -24,6 +24,9 @@ h3 { font-size: 14px; margin: 0 0 6px; font-weight: 600; }
 .small { font-size: 13px; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
 .grid { display: grid; gap: 12px; }
+/* Grid items may shrink below their content; wide tables scroll inside their card instead of spilling out. */
+.grid > * { min-width: 0; }
+.panel { overflow-x: auto; }
 .grid.two { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
