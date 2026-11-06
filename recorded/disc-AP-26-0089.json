@@ -1,15 +1,35 @@
 {
   "format": 2,
   "issue_id": "disc-AP-26-0089",
-  "recorded_at": "2026-11-06T21:38:01.209Z",
+  "recorded_at": "2026-11-06T21:46:35.070Z",
   "transport": "claude-code",
   "model": "claude-sonnet-5-5",
   "effort": "medium",
   "facts_digest": "83a5a10aaca18ddda7bb667342d84fe2f119e3c1651d45a8f611ce5d49c29fe4",
-  "prompt_hash": "5d80feba965e9229c6fe8012ee8e0aeac7051c5bbe83bd920283ff86f22a164a",
+  "prompt_hash": "a059540f73a6d25c8a0cb4818a514af8d70e09c229b954c0d3c469d6a8e7fb8f",
   "status": "planned",
   "failure": null,
   "tool_calls": [
+    {
+      "name": "discount_value",
+      "input": {
+        "invoice_id": "AP-26-0089"
+      },
+      "output": {
+        "invoice_id": "AP-26-0089",
+        "terms": "2/10 NET30",
+        "eligible": true,
+        "reason": "eligible",
+        "discount_deadline": "2026-03-21",
+        "net_due_date": "2026-04-10",
+        "base_cents": 396000,
+        "discount_cents": 7920,
+        "pay_with_discount_cents": 388080,
+        "annualized_return_pct": 37.2,
+        "must_pay_this_run_to_capture": true,
+        "match_within_tolerance": true
+      }
+    },
     {
       "name": "match_check",
       "input": {
@@ -48,166 +68,20 @@
       }
     },
     {
-      "name": "discount_value",
-      "input": {
-        "invoice_id": "AP-26-0089"
-      },
-      "output": {
-        "invoice_id": "AP-26-0089",
-        "terms": "2/10 NET30",
-        "eligible": true,
-        "reason": "eligible",
-        "discount_deadline": "2026-03-21",
-        "net_due_date": "2026-04-10",
-        "base_cents": 396000,
-        "discount_cents": 7920,
-        "pay_with_discount_cents": 388080,
-        "annualized_return_pct": 37.2,
-        "must_pay_this_run_to_capture": true,
-        "match_within_tolerance": true
-      }
-    },
-    {
       "name": "query",
       "input": {
-        "sql": "select * from invoices where vendor_id='V014'"
+        "sql": "select i.invoice_id,i.status,i.total_cents,i.due_date,i.invoice_date,v.remit_account,v.status vs from invoices i join vendors v using(vendor_id) where invoice_id='AP-26-0089'"
       },
       "output": {
         "rows": [
           {
-            "invoice_id": "AP-26-0062",
-            "vendor_id": "V014",
-            "vendor_invoice_no": "KES-7532",
-            "invoice_no_key": "KES7532",
-            "invoice_date": "2026-03-02",
-            "due_date": "2026-04-01",
-            "currency": "USD",
-            "total_cents": 346986,
-            "total_usd_cents": 346986,
-            "status": "open",
-            "is_credit_note": 0,
-            "received_via": "erp",
-            "src": "invoices.csv:64"
-          },
-          {
-            "invoice_id": "AP-26-0070",
-            "vendor_id": "V014",
-            "vendor_invoice_no": "CN-0091",
-            "invoice_no_key": "CN0091",
-            "invoice_date": "2026-03-04",
-            "due_date": "2026-03-04",
-            "currency": "USD",
-            "total_cents": -18000,
-            "total_usd_cents": -18000,
-            "status": "open",
-            "is_credit_note": 1,
-            "received_via": "email",
-            "src": "invoices.csv:73"
-          },
-          {
             "invoice_id": "AP-26-0089",
-            "vendor_id": "V014",
-            "vendor_invoice_no": "KB-40217",
-            "invoice_no_key": "KB40217",
-            "invoice_date": "2026-03-11",
-            "due_date": "2026-04-10",
-            "currency": "USD",
+            "status": "open",
             "total_cents": 396000,
-            "total_usd_cents": 396000,
-            "status": "open",
-            "is_credit_note": 0,
-            "received_via": "email",
-            "src": "invoices.csv:92"
-          },
-          {
-            "invoice_id": "AP-26-0092",
-            "vendor_id": "V014",
-            "vendor_invoice_no": "KES-7511",
-            "invoice_no_key": "KES7511",
-            "invoice_date": "2026-03-13",
-            "due_date": "2026-04-12",
-            "currency": "USD",
-            "total_cents": 521160,
-            "total_usd_cents": 521160,
-            "status": "open",
-            "is_credit_note": 0,
-            "received_via": "erp",
-            "src": "invoices.csv:95"
-          },
-          {
-            "invoice_id": "AP-26-0093",
-            "vendor_id": "V014",
-            "vendor_invoice_no": "KES-7555",
-            "invoice_no_key": "KES7555",
-            "invoice_date": "2026-03-13",
-            "due_date": "2026-04-12",
-            "currency": "USD",
-            "total_cents": 570240,
-            "total_usd_cents": 570240,
-            "status": "open",
-            "is_credit_note": 0,
-            "received_via": "erp",
-            "src": "invoices.csv:96"
-          }
-        ],
-        "truncated": false
-      }
-    },
-    {
-      "name": "query",
-      "input": {
-        "sql": "select vendor_id,remit_account,contact_name,contact_phone,contact_email,status from vendors where vendor_id='V014'"
-      },
-      "output": {
-        "rows": [
-          {
-            "vendor_id": "V014",
+            "due_date": "2026-04-10",
+            "invoice_date": "2026-03-11",
             "remit_account": "QF-TEST-5572-6950",
-            "contact_name": "Yara Okafor",
-            "contact_phone": "(916) 555-0191",
-            "contact_email": "yara@kestrelbox.example",
-            "status": "active"
-          }
-        ],
-        "truncated": false
-      }
-    },
-    {
-      "name": "query",
-      "input": {
-        "sql": "select invoice_id,po_line_id,quantity,line_total_cents from invoice_lines where po_line_id='PO-24079-1' or invoice_id in ('AP-26-0062','AP-26-0092','AP-26-0093')"
-      },
-      "output": {
-        "rows": [
-          {
-            "invoice_id": "AP-26-0062",
-            "po_line_id": "PO-24037-1",
-            "quantity": 4689,
-            "line_total_cents": 346986
-          },
-          {
-            "invoice_id": "AP-26-0089",
-            "po_line_id": "PO-24079-1",
-            "quantity": 3600,
-            "line_total_cents": 396000
-          },
-          {
-            "invoice_id": "AP-26-0092",
-            "po_line_id": "PO-24036-1",
-            "quantity": 3192,
-            "line_total_cents": 430920
-          },
-          {
-            "invoice_id": "AP-26-0092",
-            "po_line_id": "PO-24036-2",
-            "quantity": 1504,
-            "line_total_cents": 90240
-          },
-          {
-            "invoice_id": "AP-26-0093",
-            "po_line_id": "PO-24038-1",
-            "quantity": 4224,
-            "line_total_cents": 570240
+            "vs": "active"
           }
         ],
         "truncated": false
@@ -216,23 +90,23 @@
     {
       "name": "submit_plan",
       "input": {
-        "summary": "AP-26-0089 (Kestrel, KB-40217) matches its PO and receipts with no variance, has no duplicates, and is eligible for the 2/10 discount ending 2026-03-21. The next run is 2026-03-23, which is too late, so I recommend paying $3,880.80 in today's run.",
+        "summary": "AP-26-0089 matches PO and receipts exactly and is eligible for a 2/10 discount ending 2026-03-21. The next run (03-23) is too late, so pay today with the discount: $3,880.80 instead of $3,960.00.",
         "options": [
           {
             "id": "A",
-            "description": "Schedule payment today with the discount, to the remit account on file.",
-            "consequences": "Pays $3,880.80 and saves $79.20 (37.2% annualized). The invoice is fully matched, so the risk is low.",
+            "description": "Schedule payment today with the discount",
+            "consequences": "Pays $3,880.80 to the remit account on file and captures $79.20 (37.2% annualized return).",
             "chosen": true
           },
           {
             "id": "B",
-            "description": "Do nothing and pay on the 2026-03-23 run.",
-            "consequences": "The discount expires on 2026-03-21, so we lose $79.20 and pay the full $3,960.00.",
+            "description": "Do nothing and pay in the 03-23 run or at net due date",
+            "consequences": "The discount expires 03-21 and $79.20 is lost.",
             "chosen": false
           }
         ],
         "outcome": "act",
-        "rationale": "match_check for AP-26-0089 shows the line is within tolerance with 0 variance. It was billed at 150 units against 150 received on PO-24079-1, with payable $3,960.00 and nothing disputed. discount_value shows it is eligible, must be paid in this run, and the discounted amount is 388080 cents. No other V014 invoice uses PO-24079-1, so there is no duplicate. There are no emails or bank-change requests tied to this issue. Payment goes to the remit_account on file.",
+        "rationale": "discount_value shows eligible, must pay this run to capture. match_check shows the invoice is within tolerance, with no variance and fully received (PO-24079-1). Vendor is active, no emails are involved, and payment goes to the remit_account on file.",
         "actions": [
           {
             "type": "schedule_payment",
@@ -253,23 +127,23 @@
     }
   ],
   "final_plan": {
-    "summary": "AP-26-0089 (Kestrel, KB-40217) matches its PO and receipts with no variance, has no duplicates, and is eligible for the 2/10 discount ending 2026-03-21. The next run is 2026-03-23, which is too late, so I recommend paying $3,880.80 in today's run.",
+    "summary": "AP-26-0089 matches PO and receipts exactly and is eligible for a 2/10 discount ending 2026-03-21. The next run (03-23) is too late, so pay today with the discount: $3,880.80 instead of $3,960.00.",
     "options": [
       {
         "id": "A",
-        "description": "Schedule payment today with the discount, to the remit account on file.",
-        "consequences": "Pays $3,880.80 and saves $79.20 (37.2% annualized). The invoice is fully matched, so the risk is low.",
+        "description": "Schedule payment today with the discount",
+        "consequences": "Pays $3,880.80 to the remit account on file and captures $79.20 (37.2% annualized return).",
         "chosen": true
       },
       {
         "id": "B",
-        "description": "Do nothing and pay on the 2026-03-23 run.",
-        "consequences": "The discount expires on 2026-03-21, so we lose $79.20 and pay the full $3,960.00.",
+        "description": "Do nothing and pay in the 03-23 run or at net due date",
+        "consequences": "The discount expires 03-21 and $79.20 is lost.",
         "chosen": false
       }
     ],
     "outcome": "act",
-    "rationale": "match_check for AP-26-0089 shows the line is within tolerance with 0 variance. It was billed at 150 units against 150 received on PO-24079-1, with payable $3,960.00 and nothing disputed. discount_value shows it is eligible, must be paid in this run, and the discounted amount is 388080 cents. No other V014 invoice uses PO-24079-1, so there is no duplicate. There are no emails or bank-change requests tied to this issue. Payment goes to the remit_account on file.",
+    "rationale": "discount_value shows eligible, must pay this run to capture. match_check shows the invoice is within tolerance, with no variance and fully received (PO-24079-1). Vendor is active, no emails are involved, and payment goes to the remit_account on file.",
     "actions": [
       {
         "type": "schedule_payment",
@@ -288,11 +162,11 @@
   },
   "usage": {
     "input_tokens": 8,
-    "output_tokens": 1631,
-    "cache_read_input_tokens": 22686,
-    "cache_creation_input_tokens": 4194
+    "output_tokens": 1720,
+    "cache_read_input_tokens": 22252,
+    "cache_creation_input_tokens": 3423
   },
-  "cost_usd": 0.0353706,
+  "cost_usd": 0.0331332,
   "cost_estimated": true,
-  "duration_ms": 16911
+  "duration_ms": 16125
 }
