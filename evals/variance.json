@@ -30,22 +30,17 @@
     },
     {
       "id": "quantity_variance",
-      "recorded_at": "2026-11-06T22:10:29.420Z",
+      "recorded_at": "2026-11-06T22:19:57.782Z",
       "model": "claude-sonnet-5-5",
       "transport": "claude-code",
       "effort": "medium",
-      "runs": 3,
-      "passes": 2,
+      "runs": 5,
+      "passes": 5,
       "outcomes": {
-        "hold_and_ask": 3
+        "hold_and_ask": 4,
+        "act": 1
       },
-      "failures": [
-        {
-          "run": 1,
-          "reason": "missing a required action: one of short_pay / request_credit_note / hold_payment",
-          "recording": null
-        }
-      ],
+      "failures": [],
       "kept": false
     },
     {
