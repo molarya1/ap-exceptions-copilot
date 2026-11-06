@@ -11,7 +11,7 @@ import { approveAction, rejectAction, type ApprovalDeps } from '../src/work/appr
 import { mintCapability } from '../src/work/capability';
 import { WorkStore } from '../src/work/store';
 import { fixtureExtractions } from './fixtures/extractions';
-import { duplicateInvoices, facts, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
+import { duplicateCopies, facts, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
 
 function result(actions: Action[]): RunResult {
   return {
@@ -29,7 +29,7 @@ async function setup(path: string | null = null) {
   const pay: Action = { type: 'schedule_payment', invoice_id: inv, amount_cents: 1_215_200, currency: 'USD', take_discount: true, pay_to_account: vendorRow(f, s.vendor_id).remit_account };
   const { runId } = store.saveRun(issueFor(issues, 'discount_juniper').issue_id, 'replay', result([pay]));
   const action = store.actions({ planId: runId })[0]!;
-  const deps: ApprovalDeps = { store, facts: f.db, duplicateInvoices: () => duplicateInvoices(issues) };
+  const deps: ApprovalDeps = { store, facts: f.db, duplicateCopies: () => duplicateCopies(issues) };
   return { store, deps, action, issues, inv };
 }
 
@@ -78,11 +78,11 @@ test('a stale action is refused when current data no longer supports it', async 
   const issues = detectIssues(changed.db);
   // The discount issue disappears once the invoice is paid; even if it were still active, the re-check refuses.
   store.syncIssues(issues);
-  const d1 = approveAction(human(), { store, facts: changed.db, duplicateInvoices: () => duplicateInvoices(issues) }, action.action_id, action.payload_hash);
+  const d1 = approveAction(human(), { store, facts: changed.db, duplicateCopies: () => duplicateCopies(issues) }, action.action_id, action.payload_hash);
   assert.match((d1 as { refused: string }).refused, /no longer detected/);
 
   store.tx(() => store.db.run('UPDATE issues SET active = 1'));
-  const d2 = approveAction(human(), { store, facts: changed.db, duplicateInvoices: () => duplicateInvoices(issues) }, action.action_id, action.payload_hash);
+  const d2 = approveAction(human(), { store, facts: changed.db, duplicateCopies: () => duplicateCopies(issues) }, action.action_id, action.payload_hash);
   assert.equal(d2.ok, false);
   assert.match((d2 as { refused: string }).refused, /preconditions no longer hold/);
   assert.ok((d2 as { problems: string[] }).problems.some((p) => /status is paid/.test(p)));

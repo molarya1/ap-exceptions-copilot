@@ -20,7 +20,7 @@ export interface RunDeps {
   transport: Transport;
   db: Db;
   issue: Issue;
-  duplicateInvoices: ReadonlySet<string>;
+  duplicateCopies: ReadonlyMap<string, string>;
   audit: Audit;
   limits?: Partial<typeof AGENT_LIMITS>;
 }
@@ -63,7 +63,7 @@ export async function investigate(deps: RunDeps): Promise<RunResult> {
     if (name === 'submit_plan') {
       const parsed = PlanSchema.safeParse(input);
       const problems = parsed.success
-        ? checkPlan(parsed.data, { db: deps.db, issue: deps.issue, runCalc: state.calc, duplicateInvoices: deps.duplicateInvoices })
+        ? checkPlan(parsed.data, { db: deps.db, issue: deps.issue, runCalc: state.calc, duplicateCopies: deps.duplicateCopies })
         : parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
       toolCalls.push({ name, input, ...(problems.length ? { error: problems.join('\n') } : { output: 'accepted' }) });
       audit.write({ kind: problems.length ? 'plan_rejected' : 'plan_accepted', input, problems });

@@ -28,6 +28,8 @@ const INVOICE_SELECT = `SELECT i.invoice_id, i.vendor_id, i.vendor_invoice_no, i
   i.total_cents, i.total_usd_cents, i.status, v.legal_name FROM invoices i JOIN vendors v USING (vendor_id)`;
 
 /** Same vendor and invoice-number key, or same vendor, amount and close dates. */
+const KEEP_ORDER = ['paid', 'approved'];
+
 export function detectDuplicates(db: Db): DetectedIssue[] {
   const pairs = db.all<{ a: string; b: string; why: string }>(
     `SELECT a.invoice_id AS a, b.invoice_id AS b,
@@ -55,20 +57,31 @@ export function detectDuplicates(db: Db): DetectedIssue[] {
   return [...groups.values()].map((ids) => {
     const rows = db.all<InvoiceRow>(`${INVOICE_SELECT} WHERE i.invoice_id IN (${[...ids].map(() => '?').join(',')}) ORDER BY i.invoice_id`, [...ids]);
     const first = rows[0]!;
+    // The kept original: the one already paid or approved for this run, else the earliest
+    // invoice date, else the first entered (lowest AP id). Every other invoice is a copy.
+    const rank = (r: InvoiceRow) => KEEP_ORDER.indexOf(r.status) + 1 || KEEP_ORDER.length + 1;
+    const [kept, ...copies] = [...rows].sort((a, b) => rank(a) - rank(b) || a.invoice_date.localeCompare(b.invoice_date) || a.invoice_id.localeCompare(b.invoice_id));
+    const label = (r: InvoiceRow) => `${r.invoice_id} (${r.vendor_invoice_no}, ${r.status})`;
     const reasons = [...new Set(pairs.filter((p) => ids.has(p.a)).map((p) => p.why))];
     const atRisk = rows.reduce((s, r) => s + r.total_usd_cents, 0) - Math.max(...rows.map((r) => r.total_usd_cents));
     const emails = relatedEmails(db, first.vendor_id, rows.map((r) => r.invoice_no_key));
     return {
       issue_id: `dup-${first.vendor_id}-${first.invoice_no_key}`,
       type: 'duplicate_invoice',
-      title: `Possible duplicate: ${rows.map((r) => `${r.invoice_id} (${r.vendor_invoice_no}, ${r.status})`).join(' and ')} from ${first.legal_name}`,
+      title: `Duplicate invoice from ${first.legal_name}: ${copies.map(label).join(', ')} copies ${label(kept!)}`,
       vendor_id: first.vendor_id,
       invoice_ids: rows.map((r) => r.invoice_id),
       email_ids: emails,
       money_at_risk_usd_cents: atRisk,
       deadline: rows.some((r) => r.status === 'approved') ? BUSINESS_DATE : rows.map((r) => r.due_date).sort()[0]!,
       evidence_ids: [...rows.map((r) => r.invoice_id), ...emails],
-      details: { reasons, copies: rows.map((r) => ({ invoice_id: r.invoice_id, printed_number: r.vendor_invoice_no, status: r.status, total_cents: r.total_cents, invoice_date: r.invoice_date })) },
+      details: {
+        reasons,
+        kept_invoice_id: kept!.invoice_id,
+        copy_invoice_ids: copies.map((r) => r.invoice_id),
+        kept_because: kept!.status === 'paid' || kept!.status === 'approved' ? `already ${kept!.status}` : 'earliest invoice',
+        invoices: rows.map((r) => ({ invoice_id: r.invoice_id, printed_number: r.vendor_invoice_no, status: r.status, total_cents: r.total_cents, invoice_date: r.invoice_date })),
+      },
     };
   });
 }

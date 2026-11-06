@@ -6,7 +6,7 @@ import { memoryAudit } from '../src/agent/audit';
 import { investigate, type RunDeps } from '../src/agent/loop';
 import { SYSTEM_PROMPT } from '../src/agent/prompt';
 import { childEnv, claudeCodeTransport, mcpName, type AgentSdk } from '../src/llm/claude-code';
-import { duplicateInvoices, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
+import { duplicateCopies, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
 
 // The Claude Code transport against a fake Agent SDK. The fake captures the in-process MCP
 // tools and plays a model that calls them, then emits the result message the CLI would.
@@ -41,7 +41,7 @@ function result(subtype: string, extra: Record<string, unknown> = {}): SDKMessag
 async function run(script: Script, limits?: RunDeps['limits']) {
   const { facts, issues } = await sharedWorld();
   const fake = fakeSdk(script);
-  const r = await investigate({ transport: claudeCodeTransport('claude-sonnet-5-5', 'medium', fake.sdk), db: facts.db, issue: issueFor(issues, 'discount_juniper'), duplicateInvoices: duplicateInvoices(issues), audit: memoryAudit(), ...(limits ? { limits } : {}) });
+  const r = await investigate({ transport: claudeCodeTransport('claude-sonnet-5-5', 'medium', fake.sdk), db: facts.db, issue: issueFor(issues, 'discount_juniper'), duplicateCopies: duplicateCopies(issues), audit: memoryAudit(), ...(limits ? { limits } : {}) });
   return { r, seen: fake.seen };
 }
 

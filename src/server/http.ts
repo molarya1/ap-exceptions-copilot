@@ -31,7 +31,7 @@ export function createApp(app: App, port: number, publicDir = 'public'): Server 
   const sessions = new Map<string, HumanCapability>();
   const hosts = new Set([`localhost:${port}`, `127.0.0.1:${port}`, `[::1]:${port}`]);
   const origins = new Set([...hosts].map((h) => `http://${h}`));
-  const deps = { store: app.store, facts: app.facts.db, duplicateInvoices: () => app.duplicateInvoices() };
+  const deps = { store: app.store, facts: app.facts.db, duplicateCopies: () => app.duplicateCopies() };
 
   const send = (res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) => {
     const text = typeof body === 'string' ? body : JSON.stringify(body);

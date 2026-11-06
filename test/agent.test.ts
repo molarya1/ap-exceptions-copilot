@@ -5,13 +5,13 @@ import { investigate, type RunDeps } from '../src/agent/loop';
 import { runQuery, readEmail, ToolError } from '../src/agent/tools';
 import { messagesTransport } from '../src/llm/messages';
 import { lastToolResults, scripted, type Turn } from './fixtures/fake-api';
-import { duplicateInvoices, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
+import { duplicateCopies, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
 
 async function deps(scenarioId: string, turns: Turn[], limits?: RunDeps['limits']) {
   const { facts, issues } = await sharedWorld();
   const api = scripted(turns);
   const audit = memoryAudit();
-  const d: RunDeps = { transport: messagesTransport(api, 'claude-sonnet-5-5', 'medium'), db: facts.db, issue: issueFor(issues, scenarioId), duplicateInvoices: duplicateInvoices(issues), audit, ...(limits ? { limits } : {}) };
+  const d: RunDeps = { transport: messagesTransport(api, 'claude-sonnet-5-5', 'medium'), db: facts.db, issue: issueFor(issues, scenarioId), duplicateCopies: duplicateCopies(issues), audit, ...(limits ? { limits } : {}) };
   return { d, api, audit, facts };
 }
 

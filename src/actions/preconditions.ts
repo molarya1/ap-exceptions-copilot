@@ -17,8 +17,8 @@ export interface ActionContext {
   db: Db;
   /** Calculator results to compare amounts against. */
   calc: (invoiceId: string) => CalcResults;
-  /** Invoices that belong to an open duplicate issue. */
-  duplicateInvoices: ReadonlySet<string>;
+  /** Copies in open duplicate issues, mapped to the kept original. */
+  duplicateCopies: ReadonlyMap<string, string>;
   /** Wording for a missing calculator result: plan checks ask the agent to call the tool. */
   missingCalc: (tool: 'match_check' | 'discount_value', invoiceId: string) => string;
 }
@@ -56,7 +56,8 @@ export function actionProblems(a: Action, ctx: ActionContext): string[] {
   if (!PAYABLE_STATUSES.includes(inv.status)) p.push(`${where}: invoice status is ${inv.status}; only open or approved invoices can be acted on.`);
 
   if (a.type === 'schedule_payment' || a.type === 'short_pay') {
-    if (ctx.duplicateInvoices.has(a.invoice_id)) p.push(`${where}: invoice is part of an open duplicate issue and cannot be paid until that is resolved.`);
+    const original = ctx.duplicateCopies.get(a.invoice_id);
+    if (original) p.push(`${where}: invoice is a copy of ${original} in an open duplicate issue and must not be paid; hold it instead.`);
     if (a.pay_to_account !== inv.remit_account) {
       p.push(`${where}: pay_to_account ${a.pay_to_account} is not the verified account on file. Payments go only to the account on file; a new account needs verify_bank_change first.`);
     }

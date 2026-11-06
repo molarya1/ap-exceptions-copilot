@@ -12,7 +12,7 @@ export interface CheckContext {
   issue: Issue;
   /** match_check and discount_value results from tool calls in this run. */
   runCalc: Map<string, CalcResults>;
-  duplicateInvoices: ReadonlySet<string>;
+  duplicateCopies: ReadonlyMap<string, string>;
 }
 
 const ID_LOOKUPS: [RegExp, string][] = [
@@ -64,7 +64,7 @@ export function checkPlan(plan: Plan, ctx: CheckContext): string[] {
       ...actionProblems(a, {
         db: ctx.db,
         calc: (id) => ctx.runCalc.get(id) ?? {},
-        duplicateInvoices: ctx.duplicateInvoices,
+        duplicateCopies: ctx.duplicateCopies,
         missingCalc: (tool, id) => `Call ${tool} for ${id} in this run; amounts must come from its result.`,
       }),
     );

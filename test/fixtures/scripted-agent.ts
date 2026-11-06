@@ -11,7 +11,7 @@ type Results = Map<string, Record<string, unknown>>;
 
 function brief(params: Anthropic.MessageCreateParamsNonStreaming) {
   const text = String(params.messages[0]!.content);
-  return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as { type: string; vendor_id: string; invoice_ids: string[]; email_ids: string[] };
+  return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as { type: string; vendor_id: string; invoice_ids: string[]; email_ids: string[]; details: Record<string, unknown> };
 }
 
 /** Tool results so far, keyed "tool:arg". */
@@ -39,8 +39,8 @@ function decide(b: ReturnType<typeof brief>, r: Results) {
   const base = { open_questions: [] as string[], evidence_ids: [...b.invoice_ids, ...b.email_ids] };
   switch (b.type) {
     case 'duplicate_invoice': {
-      const copy = b.invoice_ids.find((id) => match(id).status === 'open') ?? b.invoice_ids[1]!;
-      return { ...base, summary: 'Two copies of one invoice.', rationale: 'Same vendor and number.', outcome: 'act', options: [opt('Hold the second copy', true), opt('Do nothing', false)], actions: [{ type: 'hold_payment', invoice_id: copy, reason: 'Duplicate of the approved copy.' }] };
+      const copies = b.details.copy_invoice_ids as string[];
+      return { ...base, summary: 'Two copies of one invoice.', rationale: 'Same vendor and number.', outcome: 'act', options: [opt('Hold the copy', true), opt('Do nothing', false)], actions: copies.map((id) => ({ type: 'hold_payment', invoice_id: id, reason: `Copy of ${String(b.details.kept_invoice_id)}.` })) };
     }
     case 'match_exception': {
       const id = b.invoice_ids[0]!;

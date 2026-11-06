@@ -34,7 +34,7 @@ test("a recorded plan that today's checks reject shows as failed, not valid", as
   submit.input.actions[0].amount_cents += 100;
   writeFileSync(path, JSON.stringify(rec));
 
-  const result = await replayRun(loadRecording(app.opts.recordedDir, issue.issue_id)!, { db: app.facts.db, issue, duplicateInvoices: app.duplicateInvoices(), audit: memoryAudit() });
+  const result = await replayRun(loadRecording(app.opts.recordedDir, issue.issue_id)!, { db: app.facts.db, issue, duplicateCopies: app.duplicateCopies(), audit: memoryAudit() });
   assert.equal(result.status, 'failed');
   assert.match(result.failure!, /current checks do not accept the recorded run/);
   assert.ok(result.tool_calls.some((c) => c.name === 'submit_plan' && /differs from discount_value/.test(c.error ?? '')));

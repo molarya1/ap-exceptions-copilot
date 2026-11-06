@@ -3,7 +3,7 @@ import type { Action } from '../src/actions/schema';
 import { memoryAudit } from '../src/agent/audit';
 import { investigate, type RunResult } from '../src/agent/loop';
 import { loadRecording, replayRun, saveRecording } from '../src/agent/replay';
-import { detectIssues } from '../src/detect/index';
+import { detectIssues, duplicateCopies } from '../src/detect/index';
 import type { Issue } from '../src/detect/types';
 import { extractAll, transportExtractor } from '../src/extract/extract';
 import type { VerifiedExtraction } from '../src/extract/schema';
@@ -51,7 +51,6 @@ export interface EvalReport {
 }
 
 const recordingDir = (o: EvalOptions, c: EvalCase) => (c.overlay ? join(o.recordedDir, 'overlays', c.id) : o.recordedDir);
-const dupSet = (issues: Issue[]) => new Set(issues.filter((i) => i.type === 'duplicate_invoice').flatMap((i) => i.invoice_ids));
 
 async function world(o: EvalOptions, extractions: Map<string, VerifiedExtraction>, c: EvalCase): Promise<{ facts: Facts; issues: Issue[] }> {
   const facts = await buildFacts(o.dataDir, extractions, c.overlay ? { overlaySql: c.overlay.sql } : {});
@@ -75,7 +74,7 @@ export async function recordCases(o: EvalOptions, live: { agent: Transport; extr
     if (!issue) {
       r = { id: c.id, status: 'skipped', detail: c.expect.detected ? 'expected issue was not detected' : 'detection-only case' };
     } else {
-      const result = await investigate({ transport: live.agent, db: facts.db, issue, duplicateInvoices: dupSet(issues), audit: memoryAudit() });
+      const result = await investigate({ transport: live.agent, db: facts.db, issue, duplicateCopies: duplicateCopies(issues), audit: memoryAudit() });
       saveRecording(recordingDir(o, c), issue.issue_id, effort, facts.digest, result);
       r = { id: c.id, status: result.status, detail: result.failure };
     }
@@ -96,7 +95,7 @@ async function guardrails(o: EvalOptions, extractions: Map<string, VerifiedExtra
   const store = await WorkStore.open(null);
   store.syncIssues(issues);
   const { runId } = store.saveRun(issueId, 'replay', result);
-  const deps: ApprovalDeps = { store, facts: facts.db, duplicateInvoices: () => dupSet(issues) };
+  const deps: ApprovalDeps = { store, facts: facts.db, duplicateCopies: () => duplicateCopies(issues) };
   const human = mintCapability('eval-reviewer');
   const outboxRows = () => store.db.all('SELECT 1 FROM outbox').length;
 
@@ -138,7 +137,7 @@ export async function runEvals(o: EvalOptions): Promise<EvalReport> {
       if (!rec) {
         r.decision = { pass: false, reasons: [`no recording for ${issue.issue_id} in ${recordingDir(o, c)}; record it with \`npm run eval -- --case ${c.id}\``] };
       } else {
-        const run = await replayRun(rec, { db: facts.db, issue, duplicateInvoices: dupSet(issues), audit: memoryAudit() });
+        const run = await replayRun(rec, { db: facts.db, issue, duplicateCopies: duplicateCopies(issues), audit: memoryAudit() });
         r.decision = gradePlan(c, run.plan, run.failure);
         r.outcome = run.plan?.outcome ?? 'run failed';
         r.actions = run.plan?.actions.map((a) => a.type) ?? [];

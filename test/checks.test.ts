@@ -4,14 +4,14 @@ import type { Action } from '../src/actions/schema';
 import { checkPlan, type CheckContext } from '../src/agent/checks';
 import type { Plan } from '../src/agent/plan';
 import { executeTool, type RunState } from '../src/agent/tools';
-import { duplicateInvoices, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
+import { duplicateCopies, issueFor, scenario, sharedWorld, vendorRow } from './helpers';
 
 async function setup(scenarioId: string, calls: ['match_check' | 'discount_value', string][] = []) {
   const { facts, issues } = await sharedWorld();
   const issue = issueFor(issues, scenarioId);
   const state: RunState = { calc: new Map() };
   for (const [tool, invoice_id] of calls) executeTool(facts.db, state, tool, { invoice_id });
-  const ctx: CheckContext = { db: facts.db, issue, runCalc: state.calc, duplicateInvoices: duplicateInvoices(issues) };
+  const ctx: CheckContext = { db: facts.db, issue, runCalc: state.calc, duplicateCopies: duplicateCopies(issues) };
   return { facts, issue, ctx, state };
 }
 
@@ -65,13 +65,15 @@ test('rejects payment amounts that do not come from match_check in this run', as
   assert.ok(checkPlan(plan([full], { evidence_ids: [inv] }), after.ctx).some((p) => /outside tolerance; use short_pay/.test(p)));
 });
 
-test('rejects paying an invoice that has an open duplicate issue', async () => {
+test('a duplicate copy cannot be paid; the kept original can', async () => {
   const s = scenario('duplicate_invoice');
+  const [original, copy] = s.invoice_ids as [string, string];
   const { ctx, facts } = await setup('duplicate_invoice', s.invoice_ids.map((id) => ['match_check', id] as ['match_check', string]));
   const acct = vendorRow(facts, s.vendor_id).remit_account;
-  const pay: Action = { type: 'schedule_payment', invoice_id: s.invoice_ids[1]!, amount_cents: Number(s.facts.total_cents), currency: 'USD', take_discount: false, pay_to_account: acct };
-  assert.ok(checkPlan(plan([pay], { evidence_ids: s.invoice_ids }), ctx).some((p) => /open duplicate issue/.test(p)));
-  const hold: Action = { type: 'hold_payment', invoice_id: s.invoice_ids[1]!, reason: 'duplicate of the approved copy' };
+  const pay = (id: string): Action => ({ type: 'schedule_payment', invoice_id: id, amount_cents: Number(s.facts.total_cents), currency: 'USD', take_discount: false, pay_to_account: acct });
+  assert.ok(checkPlan(plan([pay(copy)], { evidence_ids: s.invoice_ids }), ctx).some((p) => new RegExp(`copy of ${original}`).test(p)));
+  assert.deepEqual(checkPlan(plan([pay(original)], { evidence_ids: s.invoice_ids }), ctx), []);
+  const hold: Action = { type: 'hold_payment', invoice_id: copy, reason: `copy of ${original}` };
   assert.deepEqual(checkPlan(plan([hold], { evidence_ids: s.invoice_ids }), ctx), []);
 });
 

@@ -50,9 +50,7 @@ export function issueFor(issues: Issue[], scenarioId: string): Issue {
   return hit;
 }
 
-export function duplicateInvoices(issues: Issue[]): Set<string> {
-  return new Set(issues.filter((i) => i.type === 'duplicate_invoice').flatMap((i) => i.invoice_ids));
-}
+export { duplicateCopies } from '../src/detect/index';
 
 export function vendorRow(f: Facts, vendorId: string) {
   return f.db.get<{ remit_account: string; contact_name: string; contact_phone: string; contact_email: string }>(

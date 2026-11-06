@@ -6,7 +6,7 @@ import { investigate, type Effort } from './agent/loop';
 import { liveTransport, type LiveVia } from './llm/live';
 import type { Transport } from './llm/transport';
 import { loadRecording, replayRun, saveRecording } from './agent/replay';
-import { detectIssues } from './detect/index';
+import { detectIssues, duplicateCopies } from './detect/index';
 import type { Issue } from './detect/types';
 import { extractAll, transportExtractor } from './extract/extract';
 import { buildFacts, loadInbox, type Facts } from './ingest/build';
@@ -64,8 +64,8 @@ export class App {
     return app;
   }
 
-  duplicateInvoices(): Set<string> {
-    return new Set(this.issues.filter((i) => i.type === 'duplicate_invoice').flatMap((i) => i.invoice_ids));
+  duplicateCopies(): Map<string, string> {
+    return duplicateCopies(this.issues);
   }
 
   issue(issueId: string): Issue | undefined {
@@ -77,7 +77,7 @@ export class App {
     for (const issue of this.issues) {
       const rec = loadRecording(this.opts.recordedDir, issue.issue_id);
       if (!rec) continue;
-      const result = await replayRun(rec, { db: this.facts.db, issue, duplicateInvoices: this.duplicateInvoices(), audit: memoryAudit() });
+      const result = await replayRun(rec, { db: this.facts.db, issue, duplicateCopies: this.duplicateCopies(), audit: memoryAudit() });
       this.store.saveRun(issue.issue_id, 'replay', result);
     }
   }
@@ -97,7 +97,7 @@ export class App {
         this.investigating.add(issue.issue_id);
         try {
           const runId = `${issue.issue_id}.${new Date().toISOString().replace(/[:.]/g, '-')}`;
-          const result = await investigate({ transport, db: this.facts.db, issue, duplicateInvoices: this.duplicateInvoices(), audit: fileAudit(this.opts.localDir, runId) });
+          const result = await investigate({ transport, db: this.facts.db, issue, duplicateCopies: this.duplicateCopies(), audit: fileAudit(this.opts.localDir, runId) });
           saveRecording(this.opts.recordedDir, issue.issue_id, this.opts.effort, this.facts.digest, result);
           this.store.saveRun(issue.issue_id, 'live', result);
         } catch (err) {

@@ -22,7 +22,7 @@ export interface ApprovalDeps {
   store: WorkStore;
   facts: Db;
   /** Invoices in currently detected duplicate issues. */
-  duplicateInvoices: () => ReadonlySet<string>;
+  duplicateCopies: () => ReadonlyMap<string, string>;
 }
 
 class Refusal extends Error {
@@ -62,7 +62,7 @@ export function approveAction(cap: unknown, deps: ApprovalDeps, actionId: string
     const problems = actionProblems(action, {
       db: deps.facts,
       calc: (id) => ({ match: matchCheck(deps.facts, id) ?? undefined, discount: discountValue(deps.facts, id) ?? undefined }),
-      duplicateInvoices: deps.duplicateInvoices(),
+      duplicateCopies: deps.duplicateCopies(),
       missingCalc: (_tool, id) => `invoice ${id} no longer exists`,
     });
     if (problems.length) throw new Refusal('preconditions no longer hold on current data', problems);

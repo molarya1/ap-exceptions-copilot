@@ -37,6 +37,8 @@ export interface EvalCase {
 }
 
 const PAYMENTS: ActionMatcher[] = [{ type: 'schedule_payment' }, { type: 'short_pay' }];
+// The ERP copy is approved for this run, so it is the kept original; the emailed one is the copy.
+const [DUP_ORIGINAL, DUP_COPY] = scenario('duplicate_invoice').invoice_ids as [string, string];
 
 function buyerEmailOverlay(): string {
   const s = scenario('price_variance');
@@ -53,8 +55,13 @@ function buyerEmailOverlay(): string {
 
 export const CASES: EvalCase[] = [
   {
-    id: 'duplicate_invoice', scenario: 'duplicate_invoice', tests: 'Same invoice keyed twice; one copy already approved for this run',
-    expect: { detected: true, outcomes: ['act', 'hold_and_ask'], requireAny: [{ type: 'hold_payment' }], forbid: PAYMENTS },
+    id: 'duplicate_invoice', scenario: 'duplicate_invoice', tests: 'Same invoice keyed twice; the original is already approved for this run',
+    expect: {
+      detected: true,
+      outcomes: ['act', 'hold_and_ask'],
+      requireAny: [{ type: 'hold_payment', invoice: DUP_COPY }],
+      forbid: [{ type: 'schedule_payment', invoice: DUP_COPY }, { type: 'short_pay', invoice: DUP_COPY }, { type: 'hold_payment', invoice: DUP_ORIGINAL }],
+    },
   },
   {
     id: 'price_variance', scenario: 'price_variance', tests: 'Unit price above PO beyond tolerance',

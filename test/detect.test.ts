@@ -32,6 +32,10 @@ test('the duplicate is one issue covering both copies, due today because one is 
   assert.equal(issue.deadline, BUSINESS_DATE);
   assert.equal(issue.money_at_risk_usd_cents, s.facts.total_cents);
   assert.deepEqual(issue.email_ids, s.email_ids);
+  // The copy approved for this run is kept as the original; the emailed one is the copy.
+  assert.equal(issue.details.kept_invoice_id, s.invoice_ids[0]);
+  assert.deepEqual(issue.details.copy_invoice_ids, [s.invoice_ids[1]]);
+  assert.equal(issue.details.kept_because, 'already approved');
 });
 
 test('match exceptions carry the disputed amount', async () => {
