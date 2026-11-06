@@ -5,7 +5,7 @@ import { join, relative } from 'node:path';
 import { test } from 'node:test';
 import { recordCases, runEvals, type EvalOptions } from '../evals/harness';
 import { renderReport } from '../evals/report';
-import { loadVariance, outcomeMix, repeatCases, saveVariance } from '../evals/repeat';
+import { loadVariance, outcomeMix, repeatCases, saveVariance, type CaseVariance, type Variance } from '../evals/repeat';
 import { CASES } from '../evals/cases';
 import { fixtureExtractionTransport, scriptedTransport } from './fixtures/transports';
 
@@ -73,8 +73,16 @@ test('repeat runs each decision case N times, tallies pass rates, keeps failed a
 test('a partial repeat replaces only the re-run cases in variance.json', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'apx-eval-'));
   const path = join(dir, 'variance.json');
-  const before = loadVariance('evals/variance.json')!;
-  for (const c of before.cases) c.recorded_at = '2026-10-01T00:00:00.000Z';
+  // An earlier repeat of every decision case, with one failure, written by hand so the test does
+  // not depend on the committed variance.json.
+  const earlier = { recorded_at: '2026-10-01T00:00:00.000Z', model: 'm', transport: 't', effort: 'medium', kept: false };
+  const before: Variance = {
+    cases: CASES.filter((c) => c.scenario && c.expect.detected).map((c): CaseVariance =>
+      c.id === 'quantity_variance'
+        ? { id: c.id, ...earlier, runs: 3, passes: 2, outcomes: { hold_and_ask: 3 }, failures: [{ run: 1, reason: 'missing a required action: one of short_pay / request_credit_note / hold_payment', recording: null }] }
+        : { id: c.id, ...earlier, runs: 3, passes: 3, outcomes: { act: 3 }, failures: [] },
+    ),
+  };
   writeFileSync(path, JSON.stringify(before));
 
   const o: EvalOptions = { dataDir: 'data', cachePath: join(dir, 'extractions.json'), recordedDir: join(dir, 'recorded'), cases: CASES.filter((c) => c.id === 'discount_juniper') };
