@@ -20,7 +20,7 @@ Grading is deterministic: detection is compared with the planted ground truth, a
 
 ## Variance: repeated live runs
 
-Each decision case run several times live on 2026-11-06 (`claude-sonnet-5-5` via claude-code, medium effort) and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes.
+Each decision case run several times live on 2026-11-06 (`claude-sonnet-5-5` via claude-code, medium effort) and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes. Each row is that case's latest repeat; earlier repeats are in [history.md](history.md).
 
 | Case | Passed | Outcomes |
 |---|---:|---|

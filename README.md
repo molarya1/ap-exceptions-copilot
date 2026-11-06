@@ -100,9 +100,10 @@ model can at worst propose something that gets refused.
 ## Evals
 
 **11 of 11 cases pass** on the committed recordings (`claude-sonnet-5-5` through Claude Code,
-medium effort, about $0.03–0.05 and 15–24 s per case). **26 of 27 fresh runs passed** when each
-decision case was run three more times; quantity_variance once chose to hold and ask without a
-hold action. Full tables: [`evals/results.md`](evals/results.md), with per-case pass rates under
+medium effort, about $0.03–0.05 and 15–24 s per case). In the first repeat, **26 of 27 fresh
+runs passed**; quantity_variance once held without a hold action. A plan check now rejects that,
+and quantity_variance has since passed 10 of 10 (5 before the check, 5 after). Full tables:
+[`evals/results.md`](evals/results.md), with each case's latest pass rate under
 [Variance](evals/results.md#variance-repeated-live-runs).
 
 The cases: one per planted scenario (duplicate, price and quantity variances, two expiring
@@ -125,9 +126,10 @@ failed attempt; noise and the late-receipt overlay only check detection, which i
 
 **Limitations.** Eleven cases from one seeded dataset is a regression suite, not a measure of
 accuracy in the wild. Replay proves the recorded decisions still pass today's checks; it says
-nothing about a fresh run. Fresh runs do vary: 26 of 27 passed, and the one miss
-(quantity_variance holding without a hold action) would not show up in replay at all. Three runs
-per case is still a small sample. Graders check the shape of a decision (which actions, which
+nothing about a fresh run. Fresh runs do vary: the one miss in 37 (quantity_variance holding
+without a hold action) would never have shown up in replay, and it was not reproduced, so its
+cause is a likely one rather than a proven one. Three to five runs per case is still a small
+sample. Graders check the shape of a decision (which actions, which
 outcome), not the wording of an email to a vendor.
 
 ## Design decisions and tradeoffs

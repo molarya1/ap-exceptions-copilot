@@ -52,7 +52,7 @@ export function renderReport(r: EvalReport, variance: Variance | null = null): s
       '',
       '## Variance: repeated live runs',
       '',
-      `Each decision case run ${runs.length === 1 ? `${runs[0]} times` : 'several times'} live${days.length === 1 ? ` on ${days[0]}` : ''}${setups.length === 1 ? ` (${setups[0]})` : ''} and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes.`,
+      `Each decision case run ${runs.length === 1 ? `${runs[0]} times` : 'several times'} live${days.length === 1 ? ` on ${days[0]}` : ''}${setups.length === 1 ? ` (${setups[0]})` : ''} and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes. Each row is that case's latest repeat; earlier repeats are in [history.md](history.md).`,
       '',
       `| Case | Passed | Outcomes |${extra.map((e) => ` ${e.head} |`).join('')}`,
       `|---|---:|---|${extra.map(() => '---|').join('')}`,
