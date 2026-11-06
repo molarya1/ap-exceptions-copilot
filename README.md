@@ -16,7 +16,7 @@ approved actions land in a simulated outbox.
 ## Try it in 60 seconds
 
 ```bash
-git clone <this repo> && cd ap-exceptions-copilot
+git clone https://github.com/molarya1/ap-exceptions-copilot.git && cd ap-exceptions-copilot
 npm install
 npm start
 ```
