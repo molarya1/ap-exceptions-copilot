@@ -5,7 +5,7 @@ import { join, relative } from 'node:path';
 import { test } from 'node:test';
 import { recordCases, runEvals, type EvalOptions } from '../evals/harness';
 import { renderReport } from '../evals/report';
-import { loadVariance, outcomeMix, repeatCases } from '../evals/repeat';
+import { loadVariance, outcomeMix, repeatCases, saveVariance } from '../evals/repeat';
 import { CASES } from '../evals/cases';
 import { fixtureExtractionTransport, scriptedTransport } from './fixtures/transports';
 
@@ -70,7 +70,27 @@ test('repeat runs each decision case N times, tallies pass rates, keeps failed a
   assert.equal(outcomeMix({ act: 2, hold_and_ask: 1 }), 'act ×2, hold_and_ask ×1');
 });
 
-test('variance files from before failed recordings were kept still load', () => {
-  const q = loadVariance('evals/variance.json')!.cases.find((c) => c.id === 'quantity_variance')!;
-  assert.deepEqual(q.failures, [{ run: 1, reason: 'missing a required action: one of short_pay / request_credit_note / hold_payment', recording: null }]);
+test('a partial repeat replaces only the re-run cases in variance.json', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'apx-eval-'));
+  const path = join(dir, 'variance.json');
+  const before = loadVariance('evals/variance.json')!;
+  for (const c of before.cases) c.recorded_at = '2026-10-01T00:00:00.000Z';
+  writeFileSync(path, JSON.stringify(before));
+
+  const o: EvalOptions = { dataDir: 'data', cachePath: join(dir, 'extractions.json'), recordedDir: join(dir, 'recorded'), cases: CASES.filter((c) => c.id === 'discount_juniper') };
+  const fresh = await repeatCases(o, { agent: scriptedTransport(), extraction: fixtureExtractionTransport() }, 'medium', { n: 1, keep: false, failuresDir: join(dir, 'failures') });
+  const after = saveVariance(fresh, path);
+
+  assert.deepEqual(after.cases.map((c) => c.id), before.cases.map((c) => c.id), 'same cases, same order');
+  for (const c of after.cases) {
+    if (c.id === 'discount_juniper') assert.deepEqual([c.runs, c.passes, c.recorded_at.slice(0, 10) !== '2026-10-01'], [1, 1, true], 'replaced, not added to');
+    else assert.deepEqual(c, before.cases.find((b) => b.id === c.id), `${c.id} untouched`);
+  }
+  assert.deepEqual(loadVariance(path), after);
+
+  // Dates now differ, so each row shows its own.
+  const md = renderReport(await runEvals({ ...o, cases: [] }), after);
+  assert.match(md, /\| Case \| Passed \| Outcomes \| Run on \|/);
+  assert.match(md, /\| quantity_variance \| 2\/3 \| hold_and_ask \| 2026-10-01 \|/);
+  assert.match(md, /- \*\*quantity_variance\*\* run 1: missing a required action.* \(recording not kept\)/);
 });

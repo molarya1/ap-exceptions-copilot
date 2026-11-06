@@ -1,6 +1,6 @@
 import type { EvalReport } from './harness';
 import { relative } from 'node:path';
-import { outcomeMix, type Variance } from './repeat';
+import { outcomeMix, type CaseVariance, type Variance } from './repeat';
 
 // evals/results.md, always from the replay pass. Tool calls, cost and time are the live
 // run's, read from each recording, so replaying unchanged code reproduces the same file.
@@ -40,17 +40,23 @@ export function renderReport(r: EvalReport, variance: Variance | null = null): s
       lines.push(`- **${x.id}**: ${reasons.map(cell).join('; ')}`);
     }
   }
-  if (variance) {
-    const day = variance.recorded_at.slice(0, 10);
+  if (variance?.cases.length) {
+    // Cases can be re-run on their own, so date and setup go in a column only when they differ.
+    const day = (c: CaseVariance) => c.recorded_at.slice(0, 10);
+    const setup = (c: CaseVariance) => `\`${c.model}\` via ${c.transport}, ${c.effort} effort`;
+    const days = [...new Set(variance.cases.map(day))];
+    const setups = [...new Set(variance.cases.map(setup))];
+    const runs = [...new Set(variance.cases.map((c) => c.runs))];
+    const extra = [...(days.length > 1 ? [{ head: 'Run on', of: day }] : []), ...(setups.length > 1 ? [{ head: 'Setup', of: setup }] : [])];
     lines.push(
       '',
       '## Variance: repeated live runs',
       '',
-      `Each decision case run ${variance.repeats} times live on ${day} (\`${variance.model}\` via ${variance.transport}, ${variance.effort} effort) and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes.`,
+      `Each decision case run ${runs.length === 1 ? `${runs[0]} times` : 'several times'} live${days.length === 1 ? ` on ${days[0]}` : ''}${setups.length === 1 ? ` (${setups[0]})` : ''} and graded like the table above. The table above grades one committed recording per case; this one shows how often a fresh run passes.`,
       '',
-      '| Case | Passed | Outcomes |',
-      '|---|---:|---|',
-      ...variance.cases.map((c) => `| ${c.id} | ${c.passes}/${c.runs} | ${outcomeMix(c.outcomes)} |`),
+      `| Case | Passed | Outcomes |${extra.map((e) => ` ${e.head} |`).join('')}`,
+      `|---|---:|---|${extra.map(() => '---|').join('')}`,
+      ...variance.cases.map((c) => `| ${c.id} | ${c.passes}/${c.runs} | ${outcomeMix(c.outcomes)} |${extra.map((e) => ` ${e.of(c)} |`).join('')}`),
     );
     const failing = variance.cases.filter((c) => c.failures.length);
     // Links are relative to evals/, where results.md lives.

@@ -9,9 +9,15 @@ import { recordCases, runEvals, type EvalOptions } from './harness';
 // does. Attempts are recorded in a temporary directory, so committed recordings are untouched,
 // unless every attempt of a case passed and `keep` asks for the last one to replace it. A failed
 // attempt's recording is copied to evals/variance-failures/<case>.run<i>.json so it can be read.
+// Each case carries its own date and setup, and saving replaces only the cases that were re-run,
+// so `--repeat N --case <id>` updates one row and leaves the others as they were.
 
 export interface CaseVariance {
   id: string;
+  recorded_at: string;
+  model: string;
+  transport: string;
+  effort: string;
   runs: number;
   passes: number;
   outcomes: Record<string, number>;
@@ -26,11 +32,6 @@ export interface AttemptFailure {
 }
 
 export interface Variance {
-  recorded_at: string;
-  model: string;
-  transport: string;
-  effort: string;
-  repeats: number;
   cases: CaseVariance[];
 }
 
@@ -48,7 +49,8 @@ export async function repeatCases(o: EvalOptions, live: { agent: Transport; extr
   const cases = (o.cases ?? CASES).filter((c) => c.scenario && c.expect.detected);
   // Failed attempts from an earlier repeat of these cases would be stale next to the new tally.
   if (existsSync(failuresDir)) for (const f of readdirSync(failuresDir)) if (cases.some((c) => f.startsWith(`${c.id}.run`))) rmSync(join(failuresDir, f));
-  const tally = new Map<string, CaseVariance>(cases.map((c) => [c.id, { id: c.id, runs: 0, passes: 0, outcomes: {}, failures: [], kept: false }]));
+  const setup = { recorded_at: new Date().toISOString(), model: live.agent.model, transport: live.agent.name, effort };
+  const tally = new Map<string, CaseVariance>(cases.map((c) => [c.id, { id: c.id, ...setup, runs: 0, passes: 0, outcomes: {}, failures: [], kept: false }]));
   const lastFile = new Map<string, { dir: string; file: string }>();
   const dirs: string[] = [];
 
@@ -91,19 +93,21 @@ export async function repeatCases(o: EvalOptions, live: { agent: Transport; extr
   } finally {
     for (const d of dirs) rmSync(d, { recursive: true, force: true });
   }
-  return { recorded_at: new Date().toISOString(), model: live.agent.model, transport: live.agent.name, effort, repeats: n, cases: [...tally.values()] };
+  return { cases: [...tally.values()] };
 }
 
-export function saveVariance(v: Variance, path = VARIANCE_PATH): void {
-  writeFileSync(path, JSON.stringify(v, null, 2) + '\n');
+/** Writes the re-run cases over their earlier entries; cases not in `v` keep theirs. Case order follows CASES. */
+export function saveVariance(v: Variance, path = VARIANCE_PATH): Variance {
+  const byId = new Map((loadVariance(path)?.cases ?? []).map((c) => [c.id, c]));
+  for (const c of v.cases) byId.set(c.id, c);
+  const order = (id: string) => CASES.findIndex((c) => c.id === id);
+  const merged = { cases: [...byId.values()].sort((a, b) => order(a.id) - order(b.id)) };
+  writeFileSync(path, JSON.stringify(merged, null, 2) + '\n');
+  return merged;
 }
 
 export function loadVariance(path = VARIANCE_PATH): Variance | null {
-  if (!existsSync(path)) return null;
-  const v = JSON.parse(readFileSync(path, 'utf8')) as Variance;
-  // The first repeat run stored failures as "run N: reason" strings, before recordings were kept.
-  for (const c of v.cases) c.failures = c.failures.map((f: AttemptFailure | string) => (typeof f === 'string' ? { run: Number(/^run (\d+)/.exec(f)?.[1] ?? 0), reason: f.replace(/^run \d+: /, ''), recording: null } : f));
-  return v;
+  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as Variance) : null;
 }
 
 /** "act ×2, hold_and_ask ×1", or just "act" when every run agreed. */

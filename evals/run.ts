@@ -13,7 +13,8 @@ import { renderReport } from './report';
 // npm run eval [-- --case <id> ...]   live: record the chosen cases (default all), then grade all
 // npm run eval -- --repeat N [--keep-if-all-pass] [--case <id> ...]
 //                                     live: run each decision case N times without touching the
-//                                     committed recordings; write pass rates to evals/variance.json
+//                                     committed recordings; write pass rates to evals/variance.json,
+//                                     replacing only the cases that were re-run
 //
 // Live runs go through the logged-in Claude Code CLI (LIVE_VIA_CLAUDE_CODE=1). The Messages
 // API path bills an API key, so it also needs --allow-api-billing.
